@@ -1,4 +1,5 @@
 cd:
+  kubeVersionOverride: 1.19
   dex:
     enabled: false
   server:
