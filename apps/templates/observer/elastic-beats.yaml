@@ -1,0 +1,39 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: elastic-beats
+  namespace: argo
+  labels:
+    argo.okmvp.internal/category: observer
+spec:
+  project: default
+  source:
+    repoURL: {{ .Values.repository }}
+    targetRevision: {{ .Values.revision }}
+    path: helm/observer/elastic-beats/
+    helm:
+      parameters:
+      - name:  apm-server.ingress.enabled
+        value: "true"
+      {{- if eq .Values.network.ingress.type "istio" }}
+      - name:  apm-server.ingress.annotations.kubernetes\.io\/ingress\.class
+        value: istio
+      - name:  apm-server.ingress.path
+        value: "/*"
+      {{- end }}
+      - name:  apm-server.ingress.hosts[0]
+        value: eapm.{{ .Values.domain }}
+      valueFiles:
+      - values.yaml
+      version: v2
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: elastic-beats
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - Validate=true
+    - CreateNamespace=true
+

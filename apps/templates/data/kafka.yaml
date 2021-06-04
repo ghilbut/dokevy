@@ -1,0 +1,48 @@
+{{- if .Values.data.kafka.enabled }}
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kafka
+  namespace: argo
+  labels:
+    argo.okmvp.internal/category: data
+spec:
+  project: default
+  source:
+    repoURL: {{ .Values.repository }}
+    targetRevision: {{ .Values.revision }}
+    path: helm/data/kafka/
+    helm:
+      parameters:
+      - name:  kafka.cp-zookeeper.persistence.enabled
+        value: {{ .Values.data.kafka.persistence.enabled | quote }}
+      - name:  kafka.cp-zookeeper.persistence.dataDirSize
+        value: {{ .Values.data.kafka.persistence.zookeeper.dataDirSize }}
+      - name:  kafka.cp-zookeeper.persistence.dataLogDirSize
+        value: {{ .Values.data.kafka.persistence.zookeeper.dataLogDirSize }}
+      - name:  kafka.cp-kafka.persistence.enabled
+        value: {{ .Values.data.kafka.persistence.enabled | quote }}
+      - name:  kafka.cp-kafka.persistence.size
+        value: {{ .Values.data.kafka.persistence.kafka.dataDirSize }}
+      - name:  ingress.annotations.kubernetes\.io\/ingress\.class
+        value: {{ .Values.network.ingress.type }}
+      - name:  ingress.hosts[0]
+        value: kafka.{{ .Values.domain }}
+      {{- if eq .Values.network.ingress.type "istio" }}
+      - name:  ingress.paths[0]
+        value: "/*"
+      {{- end }}
+      valueFiles:
+      - values.yaml
+      version: v2
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kafka
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - Validate=true
+    - CreateNamespace=true
+{{- end }}

@@ -1,0 +1,27 @@
+
+domain: okmvp.internal
+
+repository: https://github.com/okmvp/docker-desktop-k8s.git
+revision:   main
+
+network:
+  ingress:
+    type: nginx  # nginx, istio(progress), consul(todo), haproxy(todo)
+  metallb:
+    enabled: true
+    addresses: ""
+
+data:
+  elasticsearch:
+    persistence:
+      enabled: false
+      dataDirSize: 4Gi
+  kafka:
+    enabled: false
+    persistence:
+      enabled: false
+      zookeeper:
+        dataDirSize: 1Gi
+        dataLogDirSize: 4Gi
+      kafka:
+        dataDirSize: 4Gi
