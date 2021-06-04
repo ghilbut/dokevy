@@ -1,5 +1,5 @@
 cd:
-  kubeVersionOverride: 1.19
+  kubeVersionOverride: 1.18
 
   dex:
     enabled: false
