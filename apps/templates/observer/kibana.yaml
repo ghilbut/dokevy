@@ -17,10 +17,10 @@ spec:
         value: "true"
       - name:  kibana.ingress.annotations.kubernetes\.io\/ingress\.class
         value: {{ .Values.network.ingress.type }}
-      - name:  kibana.hosts[0].host
+      - name:  kibana.ingress.hosts[0].host
         value: kibana.{{ .Values.domain }}
       {{- if eq .Values.network.ingress.type "istio" }}
-      - name:  kibana.hosts[0].paths[0].path
+      - name:  kibana.ingress.hosts[0].paths[0].path
         value: "/*"
       {{- end }}
       valueFiles:

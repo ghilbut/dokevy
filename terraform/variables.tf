@@ -15,7 +15,7 @@ variable kubepv_root {
 
 variable domain {
   type = string
-  default = "okmvp.internal"
+  default = "ghilbut.net"
 }
 
 
