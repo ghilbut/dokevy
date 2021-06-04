@@ -1,4 +1,4 @@
-#apiVersion: v2
+apiVersion: v2
 name: argo
 description: A Helm chart for Kubernetes
 type: application
@@ -8,6 +8,6 @@ appVersion: 1.16.0
 dependencies:
 # https://github.com/argoproj/argo-helm
 - name: argo-cd
-  version: 3.6.0
+  version: 3.6.6
   repository: https://argoproj.github.io/argo-helm
   alias: cd
