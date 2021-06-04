@@ -1,5 +1,6 @@
 cd:
   kubeVersionOverride: 1.19
+  installCRDs: false
   dex:
     enabled: false
   server:
