@@ -20,23 +20,7 @@ cd:
       repositories: |
         - url: https://github.com/ghilbut/docker-desktop-k8s.git
 
-  reposServer:
-    # https://github.com/argoproj/argo-cd/issues/2383#issuecomment-582818583
-    # https://github.com/argoproj/argo-helm/blob/argo-cd-3.6.6/charts/argo-cd/values.yaml#L931
-    volumes:
-    - name: custom-tools
-      emptyDir: {}
-    initContainers:
-    - name: download-tools
-      image: alpine:3.8
-      command: [sh, -c]
-      args:
-      - wget -qO- https://get.helm.sh/helm-v2.16.1-linux-amd64.tar.gz | tar -xvzf - &&
-        mv linux-amd64/helm /custom-tools/
-      volumeMounts:
-      - mountPath: /custom-tools
-        name: custom-tools
-    volumeMounts:
-    - mountPath: /usr/local/bin/helm
-      name: custom-tools
-      subPath: helm
+  # Argo CD 3.6.x - Error: apiVersion 'v2' is not valid. The value must be "v1"
+  #   - https://github.com/argoproj/argo-cd/issues/2383#issuecomment-582818583
+  #   - https://github.com/argoproj/argo-helm/blob/argo-cd-3.6.6/charts/argo-cd/values.yaml#L931
+
