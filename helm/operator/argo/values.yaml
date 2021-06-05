@@ -10,12 +10,12 @@ cd:
     ingress:
       enabled: true
       annotations:
-        kubernetes.io/ingress.class: nginx
+        kubernetes.io/ingress.class: istio
       hosts:
-      - ""
+      - argo.ghilbut.net
       paths:
-      - "/"
+      - /*
     config:
-      url: ""
+      url: http://argo.ghilbut.net
       repositories: |
         - url: https://github.com/ghilbut/docker-desktop-k8s.git

@@ -6,6 +6,7 @@ version: 0.1.0
 appVersion: 1.16.0
 
 dependencies:
+# https://github.com/istio/istio/tree/1.10.0/manifests/charts
 - name: base
   version: 1.10.0
   repository: file://./istio-1.10.0-charts/base

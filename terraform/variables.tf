@@ -51,7 +51,7 @@ variable argo_admin_modified {
 
 variable ingress_type {
   type = string
-  default = "nginx"
+  default = "istio"
 }
 
 ##--------------------------------------------------------------

@@ -33,9 +33,10 @@ kafka:
 
 ingress:
   enabled: true
-  annotations: {}
+  annotations:
+    kubernetes.io/ingress.class: istio
   labels: {}
   hosts:
-  - kafka.okmvp.internal
+  - kafka.ghilbut.net
   paths:
-  - /
+  - /*
