@@ -19,7 +19,7 @@ spec:
         value: {{ .Values.data.elasticsearch.persistence.enabled | quote }}
       valueFiles:
       - values.yaml
-      version: v2
+      version: v3
   destination:
     server: https://kubernetes.default.svc
     namespace: elasticsearch

@@ -124,7 +124,7 @@ data template_file apps {
             value: ${var.kafka_data_size}
           valueFiles:
           - values.yaml
-          version: v2
+          version: v3
       destination:
         server: https://kubernetes.default.svc
         namespace: argo

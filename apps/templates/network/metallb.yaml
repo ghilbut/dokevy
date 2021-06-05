@@ -18,7 +18,7 @@ spec:
         value: {{ .Values.network.metallb.addresses }}
       valueFiles:
       - values.yaml
-      version: v2
+      version: v3
   destination:
     server: https://kubernetes.default.svc
     namespace: metallb-system
