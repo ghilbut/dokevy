@@ -9,5 +9,5 @@ dependencies:
 # https://github.com/jetstack/cert-manager/tree/v1.3.1/deploy/charts/cert-manager
 - name: cert-manager
   #version: v1.3.1
-  version: v1.0.6
+  version: v1.0.4
   repository: https://charts.jetstack.io/
