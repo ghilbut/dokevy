@@ -2,7 +2,7 @@
 {{- $serviceName := "kafka-cp-control-center" -}}
 {{- $servicePort := 9021 -}}
 {{- $paths := .Values.ingress.paths -}}
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: "ingress"
@@ -35,8 +35,10 @@ spec:
   {{- range $path := $paths }}
           - path: {{ $path }}
             backend:
-              serviceName: {{ $serviceName }}
-              servicePort: {{ $servicePort }}
+              service:
+                name: {{ $serviceName }}
+                port:
+                  number: {{ $servicePort }}
   {{- end -}}
   {{- end -}}
   {{- if .Values.ingress.hosts }}
