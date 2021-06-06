@@ -11,7 +11,7 @@ security:
 
 network:
   ingress:
-    type: nginx  # nginx, istio(progress), consul(todo), haproxy(todo)
+    type: istio
   metallb:
     enabled: true
     addresses: ""

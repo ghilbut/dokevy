@@ -34,7 +34,7 @@ variable apps_repository {
 
 variable apps_revision {
   type = string
-  default = "Initialize"
+  default = "main"
 }
 
 variable argo_admin_password {
@@ -44,14 +44,6 @@ variable argo_admin_password {
 variable argo_admin_modified {
   type = string
   default = "2021-01-01T00:00:00Z"
-}
-
-##--------------------------------------------------------------
-##  Ingress
-
-variable ingress_type {
-  type = string
-  default = "istio"
 }
 
 ##--------------------------------------------------------------
