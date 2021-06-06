@@ -10,6 +10,7 @@ dashboard:
     annotations:
       cert-manager.io/cluster-issuer: letsencrypt
       kubernetes.io/ingress.class: istio
+      kubernetes.io/tls-acme: "true"
     paths:
     - /*
     hosts:
