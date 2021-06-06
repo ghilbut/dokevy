@@ -44,7 +44,7 @@ spec:
     - hosts:
   {{- range $host := .Values.ingress.hosts }}
       - {{ $host }}
-  {{- end -}}
+  {{- end }}
       secretName: ingress-tls-secret
   {{- end -}}
 {{- end -}}
