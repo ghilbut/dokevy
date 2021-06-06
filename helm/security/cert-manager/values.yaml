@@ -1,0 +1,5 @@
+cert-manager:
+  installCRDs: true
+
+route53_access_key: ""
+route53_secret_key_name: ""

@@ -100,6 +100,11 @@ data template_file apps {
             value: ${var.apps_repository}
           - name:  revision
             value: ${var.apps_revision}
+          # Security / cert-manager
+          - name:  route53_access_key
+            value: ${aws_iam_access_key.letsencrypt.id}
+          - name:  route53_secret_key_name
+            value: ${kubernetes_secret.letsencrypt.metadata[0].name}
           # Network / Ingress
           - name:  network.ingress.type
             value: ${var.ingress_type}

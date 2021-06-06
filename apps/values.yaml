@@ -4,6 +4,11 @@ domain: okmvp.internal
 repository: https://github.com/okmvp/docker-desktop-k8s.git
 revision:   main
 
+security:
+  cert-manager:
+    route53_access_key: ""
+    route53_secret_key_name: ""
+
 network:
   ingress:
     type: nginx  # nginx, istio(progress), consul(todo), haproxy(todo)
