@@ -39,8 +39,8 @@ spec:
               servicePort: {{ $servicePort }}
   {{- end -}}
   {{- end -}}
-  tls:
   {{- if .Values.ingress.hosts }}
+  tls:
     - hosts:
   {{- range $host := .Values.ingress.hosts }}
       - {{ $host }}
