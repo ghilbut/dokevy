@@ -24,10 +24,6 @@ spec:
         value: {{ .Values.data.kafka.persistence.enabled | quote }}
       - name:  kafka.cp-kafka.persistence.size
         value: {{ .Values.data.kafka.persistence.kafka.dataDirSize }}
-      {{- if eq .Values.network.ingress.type "istio" }}
-      - name:  ingress.paths[0]
-        value: "/*"
-      {{- end }}
       valueFiles:
       - values.yaml
       version: v3
