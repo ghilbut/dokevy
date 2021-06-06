@@ -14,9 +14,9 @@ spec:
     helm:
       parameters:
       - name:  route53_access_key
-        value: {{ index .Values "cert-manager" "route53_access_key" }}
+        value: {{ index .Values.security "cert-manager" "route53_access_key" }}
       - name:  route53_secret_key_name
-        value: {{ index .Values "cert-manager" "route53_secret_key_name" }}
+        value: {{ index .Values.security "cert-manager" "route53_secret_key_name" }}
       valueFiles:
       - values.yaml
       version: v3
