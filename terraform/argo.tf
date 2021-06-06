@@ -105,9 +105,6 @@ data template_file apps {
             value: ${aws_iam_access_key.letsencrypt.id}
           - name:  security.cert-manager.route53_secret_key_name
             value: ${kubernetes_secret.letsencrypt.metadata[0].name}
-          # Network / Ingress
-          - name:  network.ingress.type
-            value: ${var.ingress_type}
           # Network / Metal-LB
           - name:  network.metallb.addresses
             value: ${var.metallb_addresses}
