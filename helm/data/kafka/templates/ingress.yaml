@@ -39,4 +39,12 @@ spec:
               servicePort: {{ $servicePort }}
   {{- end -}}
   {{- end -}}
+  tls:
+  {{- if .Values.ingress.hosts }}
+    - hosts:
+  {{- range $host := .Values.ingress.hosts }}
+      - {{ $host }}
+  {{- end -}}
+      secretName: ingress-tls-secret
+  {{- end -}}
 {{- end -}}
