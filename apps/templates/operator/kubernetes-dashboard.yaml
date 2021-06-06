@@ -12,9 +12,6 @@ spec:
     targetRevision: {{ .Values.revision }}
     path: helm/operator/kubernetes-dashboard
     helm:
-      parameters:
-      - name:  dashboard.ingress.hosts[0]
-        value: k8s.{{ .Values.domain }}
       valueFiles:
       - values.yaml
       version: v3

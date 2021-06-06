@@ -1,5 +1,5 @@
 
-domain: okmvp.internal
+domain: ghilbut.net
 
 repository: https://github.com/okmvp/docker-desktop-k8s.git
 revision:   main
@@ -10,8 +10,6 @@ security:
     route53_secret_key_name: ""
 
 network:
-  ingress:
-    type: istio
   metallb:
     enabled: true
     addresses: ""
