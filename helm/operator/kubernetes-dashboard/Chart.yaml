@@ -8,6 +8,6 @@ appVersion: 1.16.0
 dependencies:
 # https://github.com/kubernetes/dashboard
 - name: kubernetes-dashboard
-  version: 4.0.2
+  version: 4.2.0
   repository: https://kubernetes.github.io/dashboard/
   alias: dashboard

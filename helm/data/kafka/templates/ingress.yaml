@@ -45,6 +45,6 @@ spec:
   {{- range $host := .Values.ingress.hosts }}
       - {{ $host }}
   {{- end }}
-      secretName: ingress-tls-secret
+      secretName: kafka-cc-tls
   {{- end -}}
 {{- end -}}

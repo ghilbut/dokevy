@@ -13,3 +13,7 @@ dashboard:
     - /*
     hosts:
     - k8s.ghilbut.net
+    tls:
+    - secretName: kubernetes-dashboard-tls
+      hosts:
+      - k8s.ghilbut.net
