@@ -12,9 +12,9 @@ spec:
       name: letsencrypt
     solvers:
       - selector:
-          - dnsZones:
-              - ghilbut.com
-              - polykube.io
+          dnsZones:
+            - ghilbut.com
+            - polykube.io
         http01:
           ingress:
             class: istio

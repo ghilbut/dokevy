@@ -56,14 +56,14 @@ data template_file cert-manager {
       name: cert-manager
       namespace: ${kubernetes_namespace.argo.metadata[0].name}
       labels:
-        argo.lunit.in/category: network
-        argo.lunit.in/organization: plarform
+        argo.${var.business_domain}/category: network
+        argo.${var.business_domain}/organization: plarform
     spec:
       project: default
       source:
         repoURL: ${var.argo_apps_repository}
         targetRevision: ${var.argo_apps_revision}
-        path: helm/network/cert-manager
+        path: k8s/helm/network/cert-manager
         helm:
           parameters:
           - name:  aws.region
