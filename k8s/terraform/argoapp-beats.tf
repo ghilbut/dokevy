@@ -17,7 +17,7 @@ resource null_resource beats {
 data template_file beats {
   template = <<-EOT
     kubectl \
-      --context docker-desktop \
+      --context ${var.k8s_context} \
       apply --validate=true \
             --wait=true \
             -f - <<EOF

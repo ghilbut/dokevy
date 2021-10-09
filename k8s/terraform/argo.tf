@@ -75,7 +75,7 @@ resource null_resource argo {
 data template_file argo {
   template = <<-EOT
     kubectl \
-      --context docker-desktop \
+      --context ${var.k8s_context} \
       apply --validate=true \
             --wait=true \
             -f - <<EOF

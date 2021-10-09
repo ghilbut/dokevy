@@ -23,7 +23,7 @@ resource null_resource kafka {
 data template_file kafka {
   template = <<-EOT
     kubectl \
-      --context docker-desktop \
+      --context ${var.k8s_context} \
       apply --validate=true \
             --wait=true \
             -f - <<EOF
@@ -93,7 +93,7 @@ resource kubernetes_persistent_volume_claim zookeeper {
         storage = var.zookeeper_data_size
       }
     }
-    volume_name = kubernetes_persistent_volume.zookeeper.metadata.0.name
+    volume_name = kubernetes_persistent_volume.zookeeper.0.metadata.0.name
     storage_class_name = "local-storage"
   }
   wait_until_bound = true
@@ -150,7 +150,7 @@ resource kubernetes_persistent_volume_claim zookeeper_log {
         storage = var.zookeeper_log_size
       }
     }
-    volume_name = kubernetes_persistent_volume.zookeeper_log.metadata.0.name
+    volume_name = kubernetes_persistent_volume.zookeeper_log.0.metadata.0.name
     storage_class_name = "local-storage"
   }
   wait_until_bound = true
@@ -207,7 +207,7 @@ resource kubernetes_persistent_volume_claim kafka {
         storage = var.kafka_data_size
       }
     }
-    volume_name = kubernetes_persistent_volume.kafka.metadata.0.name
+    volume_name = kubernetes_persistent_volume.kafka.0.metadata.0.name
     storage_class_name = "local-storage"
   }
   wait_until_bound = true

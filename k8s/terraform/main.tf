@@ -12,12 +12,12 @@ terraform {
 
 provider kubernetes {
   config_path    = "~/.kube/config"
-  config_context = "ghilbut"
+  config_context = var.k8s_context
 }
 
 provider helm {
   kubernetes {
     config_path    = "~/.kube/config"
-    config_context = "ghilbut"
+    config_context = var.k8s_context
   }
 }

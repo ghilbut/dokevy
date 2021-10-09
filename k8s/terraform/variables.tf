@@ -1,3 +1,8 @@
+variable k8s_context {
+  type = string
+  default = "docker-desktop"
+}
+
 variable k8s_pv_root {
   type = string
   default = "~/work/workdata/docker-desktop/k8s-pv"

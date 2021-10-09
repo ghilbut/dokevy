@@ -17,7 +17,7 @@ resource null_resource elasticsearch {
 data template_file elasticsearch {
   template = <<-EOT
     kubectl \
-      --context docker-desktop \
+      --context ${var.k8s_context} \
       apply --validate=true \
             --wait=true \
             -f - <<EOF

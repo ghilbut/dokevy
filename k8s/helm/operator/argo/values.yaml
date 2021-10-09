@@ -32,8 +32,6 @@ cd:
     #    memory: 64Mi
     ingress:
       enabled: true
-      annotations:
-        kubernetes.io/ingress.class: istio
       ingressClassName: istio
       hosts:
         - argo.local.in
@@ -45,7 +43,7 @@ cd:
       repositories: |
         - type: git
           name: docker-desktop
-          url:  git@github.com:tesseledger/docker-desktop.git
+          url:  git@github.com:ghilbut/docker-desktop.git
           sshPrivateKeySecret:
             name: repo-github-ssh-auth
             key:  ssh-privatekey

@@ -19,7 +19,7 @@ resource null_resource nginx {
 data template_file nginx {
   template = <<-EOT
     kubectl \
-      --context docker-desktop \
+      --context ${var.k8s_context} \
       apply --validate=true \
             --wait=true \
             -f - <<EOF

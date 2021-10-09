@@ -17,7 +17,7 @@ resource null_resource metallb {
 data template_file metallb {
   template = <<-EOT
     kubectl \
-      --context docker-desktop \
+      --context ${var.k8s_context} \
       apply --validate=true \
             --wait=true \
             -f - <<EOF
