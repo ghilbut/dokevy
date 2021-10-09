@@ -1,0 +1,63 @@
+cd:
+  #controller:
+  #  resources:
+  #    limits:
+  #      cpu: 500m
+  #      memory: 512Mi
+  #    requests:
+  #      cpu: 250m
+  #      memory: 256Mi
+
+  dex:
+    enabled: false
+
+  #redis:
+  #  resources:
+  #    limits:
+  #      cpu: 200m
+  #      memory: 128Mi
+  #    requests:
+  #      cpu: 100m
+  #      memory: 64Mi
+
+  server:
+    extraArgs:
+      - --insecure
+    #resources:
+    #  limits:
+    #    cpu: 100m
+    #    memory: 128Mi
+    #  requests:
+    #    cpu: 50m
+    #    memory: 64Mi
+    ingress:
+      enabled: true
+      annotations:
+        kubernetes.io/ingress.class: istio
+      ingressClassName: istio
+      hosts:
+        - argo.local.in
+      paths:
+        - /*
+      pathType: ImplementationSpecific
+    config:
+      url: https://argo.local.in
+      repositories: |
+        - type: git
+          name: docker-desktop
+          url:  git@github.com:tesseledger/docker-desktop.git
+          sshPrivateKeySecret:
+            name: repo-github-ssh-auth
+            key:  ssh-privatekey
+    ## https://argoproj.github.io/argo-cd/operator-manual/rbac/
+    rbacConfig:
+      policy.default: role:readonly
+
+  #repoServer:
+  #  resources:
+  #    limits:
+  #      cpu: 50m
+  #      memory: 128Mi
+  #    requests:
+  #      cpu: 10m
+  #      memory: 64Mi

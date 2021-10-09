@@ -1,2 +1,5 @@
 # vim
 .*.sw[o|p]
+
+# JetBrains
+.idea
