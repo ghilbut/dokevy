@@ -5,8 +5,6 @@ resource kubernetes_namespace nginx {
 }
 
 resource null_resource nginx {
-  count = var.ingress_type == "nginx" ? 1 : 0
-
   triggers = {
     manifest = data.template_file.nginx.rendered
   }
@@ -19,7 +17,7 @@ resource null_resource nginx {
 data template_file nginx {
   template = <<-EOT
     kubectl \
-      --context ${var.k8s_context} \
+      --context docker-desktop \
       apply --validate=true \
             --wait=true \
             -f - <<EOF
@@ -30,8 +28,8 @@ data template_file nginx {
       name: ingress-nginx
       namespace: ${helm_release.argo.namespace}
       labels:
-        argo.${var.business_domain}/category: network
-        argo.${var.business_domain}/organization: system
+        argo.local.in/category: network
+        argo.local.in/organization: system
     spec:
       project: default
       source:

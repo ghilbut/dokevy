@@ -5,19 +5,19 @@ terraform {
     secret_suffix = "ghilbut"
     labels = {}
     namespace = "default"
-    config_context = "ghilbut"
+    config_context = "docker-desktop"
   }
 }
 
 
 provider kubernetes {
   config_path    = "~/.kube/config"
-  config_context = var.k8s_context
+  config_context = "docker-desktop"
 }
 
 provider helm {
   kubernetes {
     config_path    = "~/.kube/config"
-    config_context = var.k8s_context
+    config_context = "docker-desktop"
   }
 }

@@ -69,7 +69,7 @@ data template_file cert-manager {
           - name:  aws.region
             value: ${var.aws_region}
           - name:  aws.access_key
-            value: ${var.aws_iam_letsencrypt.secret_key}
+            value: ${var.aws_iam_letsencrypt.access_key}
           valueFiles:
           - values.yaml
           version: v3

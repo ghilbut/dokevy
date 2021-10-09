@@ -23,7 +23,7 @@ resource null_resource kafka {
 data template_file kafka {
   template = <<-EOT
     kubectl \
-      --context ${var.k8s_context} \
+      --context docker-desktop \
       apply --validate=true \
             --wait=true \
             -f - <<EOF
@@ -34,8 +34,8 @@ data template_file kafka {
       name: kafka
       namespace: ${helm_release.argo.namespace}
       labels:
-        argo.${var.business_domain}/category: data
-        argo.${var.business_domain}/organization: platform
+        argo.local.in/category: data
+        argo.local.in/organization: platform
     spec:
       project: default
       source:
@@ -47,7 +47,7 @@ data template_file kafka {
             kafka:
               cp-zookeeper:
                 persistence:
-                  enabled: ${var.kafka_persistence_enabled}
+                  enabled: ${var.zookeeper_persistence_enabled}
                   dataDirSize: ${var.zookeeper_data_size}
                   dataLogDirSize: ${var.zookeeper_log_size}
               cp-kafka:
@@ -56,10 +56,7 @@ data template_file kafka {
                   size: ${var.kafka_data_size}
             ingress:
               hosts:
-                - kafka.${var.inhouse_domain}
-              tls:
-                hosts:
-                  - kafka.${var.inhouse_domain}
+                - kafka.${var.domain_root}
             ---
           valueFiles:
             - values.yaml
@@ -96,14 +93,14 @@ resource kubernetes_persistent_volume_claim zookeeper {
         storage = var.zookeeper_data_size
       }
     }
-    volume_name = kubernetes_persistent_volume.zookeeper.0.metadata.0.name
+    volume_name = kubernetes_persistent_volume.zookeeper[count.index].metadata.0.name
     storage_class_name = "local-storage"
   }
   wait_until_bound = true
 }
 
 resource kubernetes_persistent_volume zookeeper {
-  count = var.kafka_persistence_enabled ? 1 : 0
+  count = length(null_resource.zookeeper_path)
 
   metadata {
     name = "zookeeper-${count.index}"
@@ -127,11 +124,32 @@ resource kubernetes_persistent_volume zookeeper {
     persistent_volume_reclaim_policy = "Recycle"
     persistent_volume_source {
       local {
-        path = "${var.k8s_pv_root}/zookeeper-${count.index}/data"
+        path = null_resource.zookeeper_path[count.index].triggers.path
       }
     }
     storage_class_name = "local-storage"
     volume_mode = "Filesystem"
+  }
+}
+
+resource null_resource zookeeper_path {
+  count = var.zookeeper_persistence_enabled ? var.zookeeper_replica_count : 0
+
+  depends_on = [
+    kubernetes_namespace.kafka,
+  ]
+
+  triggers = {
+    path = pathexpand("${var.k8s_pv_root}/zookeeper-${count.index}/data")
+  }
+
+  provisioner local-exec {
+    command = "mkdir -p ${self.triggers.path}"
+  }
+
+  provisioner local-exec {
+    when    = destroy
+    command = "rm -rf ${self.triggers.path}"
   }
 }
 
@@ -153,14 +171,14 @@ resource kubernetes_persistent_volume_claim zookeeper_log {
         storage = var.zookeeper_log_size
       }
     }
-    volume_name = kubernetes_persistent_volume.zookeeper_log.0.metadata.0.name
+    volume_name = kubernetes_persistent_volume.zookeeper_log[count.index].metadata.0.name
     storage_class_name = "local-storage"
   }
   wait_until_bound = true
 }
 
 resource kubernetes_persistent_volume zookeeper_log {
-  count = var.kafka_persistence_enabled ? 1 : 0
+  count = length(null_resource.zookeeper_log_path)
 
   metadata {
     name = "zookeeper-log-${count.index}"
@@ -184,11 +202,32 @@ resource kubernetes_persistent_volume zookeeper_log {
     persistent_volume_reclaim_policy = "Recycle"
     persistent_volume_source {
       local {
-        path = "${var.k8s_pv_root}/zookeeper-${count.index}/log"
+        path = null_resource.zookeeper_log_path[count.index].triggers.path
       }
     }
     storage_class_name = "local-storage"
     volume_mode = "Filesystem"
+  }
+}
+
+resource null_resource zookeeper_log_path {
+  count = var.zookeeper_persistence_enabled ? var.zookeeper_replica_count ? 0
+
+  depends_on = [
+    kubernetes_namespace.kafka,
+  ]
+
+  triggers = {
+    path = pathexpand("${var.k8s_pv_root}/zookeeper-${count.index}/log")
+  }
+
+  provisioner local-exec {
+    command = "mkdir -p ${self.triggers.path}"
+  }
+
+  provisioner local-exec {
+    when    = destroy
+    command = "rm -rf ${self.triggers.path}"
   }
 }
 
@@ -200,7 +239,7 @@ resource kubernetes_persistent_volume_claim kafka {
 
   metadata {
     # name: volumeclaimtemplates-name-statefulset-name-replica-index
-    name = "datadir-0-kafka-cp-kafka-${count.index}"
+    name = "datadir-0-kafka-cp-kafka-0"
     namespace = kubernetes_namespace.kafka.metadata.0.name
   }
   spec {
@@ -210,14 +249,14 @@ resource kubernetes_persistent_volume_claim kafka {
         storage = var.kafka_data_size
       }
     }
-    volume_name = kubernetes_persistent_volume.kafka.0.metadata.0.name
+    volume_name = kubernetes_persistent_volume.kafka[count.index].metadata.0.name
     storage_class_name = "local-storage"
   }
   wait_until_bound = true
 }
 
 resource kubernetes_persistent_volume kafka {
-  count = var.kafka_persistence_enabled ? 1 : 0
+  count = length(null_resource.kafka_path)
 
   metadata {
     name = "kafka-${count.index}-0"
@@ -241,10 +280,31 @@ resource kubernetes_persistent_volume kafka {
     persistent_volume_reclaim_policy = "Recycle"
     persistent_volume_source {
       local {
-        path = "${var.k8s_pv_root}/kafka-${count.index}/data-0"
+        path = null_resource.kafka_path[count.index].triggers.path
       }
     }
     storage_class_name = "local-storage"
     volume_mode = "Filesystem"
+  }
+}
+
+resource null_resource kafka_path {
+  count = var.kafka_persistence_enabled ? var.kafka_replica_count : 0
+
+  depends_on = [
+    kubernetes_namespace.kafka,
+  ]
+
+  triggers = {
+    path = pathexpand("${var.k8s_pv_root}/kafka-${count.index}/data-0")
+  }
+
+  provisioner local-exec {
+    command = "mkdir -p ${self.triggers.path}"
+  }
+
+  provisioner local-exec {
+    when    = destroy
+    command = "rm -rf ${self.triggers.path}"
   }
 }

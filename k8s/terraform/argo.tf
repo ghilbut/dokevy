@@ -50,7 +50,12 @@ resource helm_release argo {
 
   set {
     name  = "cd.server.ingress.hosts[0]"
-    value = "argo.${var.inhouse_domain}"
+    value = "argo.${var.domain_root}"
+  }
+
+  set {
+    name  = "cd.server.config.url"
+    value = "argo.${var.domain_root}"
   }
 
   set_sensitive {
@@ -80,7 +85,7 @@ resource null_resource argo {
 data template_file argo {
   template = <<-EOT
     kubectl \
-      --context ${var.k8s_context} \
+      --context docker-desktop \
       apply --validate=true \
             --wait=true \
             -f - <<EOF
@@ -91,8 +96,8 @@ data template_file argo {
       name: argo
       namespace: ${helm_release.argo.namespace}
       labels:
-        argo.${var.business_domain}/category: operator
-        argo.${var.business_domain}/organization: plarform
+        argo.local.in/category: operator
+        argo.local.in/organization: plarform
     spec:
       project: default
       source:
@@ -105,11 +110,9 @@ data template_file argo {
               server:
                 ingress:
                   hosts:
-                    - argo.${var.inhouse_domain}
-                  tls:
-                    - hosts:
-                        - argo.${var.inhouse_domain}
-                      secretName: argo-tls
+                    - argo.${var.domain_root}
+                config:
+                  url: https://argo.${var.domain_root}
             ---
           valueFiles:
             - values.yaml

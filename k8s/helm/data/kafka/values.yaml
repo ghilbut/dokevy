@@ -32,14 +32,9 @@ kafka:
 ingress:
   enabled: true
   annotations:
-    cert-manager.io/cluster-issuer: letsencrypt
-    kubernetes.io/ingress.class: nginx
-  #ingressClassName: nginx
+    kubernetes.io/ingress.class: istio
+  ingressClassName: istio
   hosts:
     - kafka.local.in
   paths:
-    - /
-  tls:
-    - hosts:
-        - kafka.local.in
-      secretName: kafka-tls
+    - /*

@@ -17,7 +17,7 @@ resource null_resource kibana {
 data template_file kibana {
   template = <<-EOT
     kubectl \
-      --context ${var.k8s_context} \
+      --context docker-desktop \
       apply --validate=true \
             --wait=true \
             -f - <<EOF
@@ -28,8 +28,8 @@ data template_file kibana {
       name: kibana
       namespace: ${helm_release.argo.namespace}
       labels:
-        argo.${var.business_domain}/category: observer
-        argo.${var.business_domain}/organization: platform
+        argo.local.in/category: observer
+        argo.local.in/organization: platform
     spec:
       project: default
       source:
@@ -57,16 +57,11 @@ data template_file kibana {
             ingress:
               enabled: true
               annotations:
-                cert-manager.io/cluster-issuer: letsencrypt
-                kubernetes.io/ingress.class: ${var.ingress_type}
+                kubernetes.io/ingress.class: nginx
               hosts:
-                - host: kibana.${var.inhouse_domain}
+                - host: kibana.${var.domain_root}
                   paths:
-                    - path: %{ if var.ingress_type == "nginx" } / %{ else } /* %{ endif }
-              tls:
-                - secretName: kibana-tls
-                  hosts:
-                    - kibana.${var.inhouse_domain}
+                    - path: /
             ---
           valueFiles:
             - values.yaml

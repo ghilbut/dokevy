@@ -15,14 +15,10 @@ spec:
       - selector:
           dnsZones:
             - ghilbut.com
-            - polykube.io
-        http01:
-          ingress:
-            class: nginx
-      - selector:
-          dnsZones:
             - ghilbut.net
+            - kubelik.io
             - polykube.in
+            - polykube.io
             - polykube.net
         dns01:
           route53:

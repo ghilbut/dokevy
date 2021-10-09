@@ -17,7 +17,7 @@ resource null_resource elasticsearch {
 data template_file elasticsearch {
   template = <<-EOT
     kubectl \
-      --context ${var.k8s_context} \
+      --context docker-desktop \
       apply --validate=true \
             --wait=true \
             -f - <<EOF
@@ -28,8 +28,8 @@ data template_file elasticsearch {
       name: elasticsearch
       namespace: ${helm_release.argo.namespace}
       labels:
-        argo.${var.business_domain}/category: data
-        argo.${var.business_domain}/organization: platform
+        argo.local.in/category: data
+        argo.local.in/organization: platform
     spec:
       project: default
       source:
@@ -101,7 +101,7 @@ resource kubernetes_persistent_volume_claim elasticsearch {
 }
 
 resource kubernetes_persistent_volume elasticsearch {
-  count = var.elasticsearch_persistence_enabled ? var.elasticsearch_replica_count : 0
+  count = length(null_resource.elasticsearch_path)
 
   metadata {
     name = "elasticsearch-${count.index}"
@@ -125,10 +125,31 @@ resource kubernetes_persistent_volume elasticsearch {
     persistent_volume_reclaim_policy = "Recycle"
     persistent_volume_source {
       local {
-        path = "${var.k8s_pv_root}/elasticsearch-${count.index}/data"
+        path = null_resource.elasticsearch_path[count.index].triggers.path
       }
     }
     storage_class_name = "local-storage"
     volume_mode = "Filesystem"
+  }
+}
+
+resource null_resource elasticsearch_path {
+  count = var.elasticsearch_persistence_enabled ? var.elasticsearch_replica_count : 0
+
+  depends_on = [
+    kubernetes_namespace.elasticsearch,
+  ]
+
+  triggers = {
+    path = pathexpand("${var.k8s_pv_root}/elasticsearch-${count.index}/data")
+  }
+
+  provisioner local-exec {
+    command = "mkdir -p ${self.triggers.path}"
+  }
+
+  provisioner local-exec {
+    when    = destroy
+    command = "rm -rf ${self.triggers.path}"
   }
 }

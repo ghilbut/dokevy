@@ -1,21 +1,11 @@
-variable k8s_context {
-  type = string
-  default = "docker-desktop"
-}
-
 variable k8s_pv_root {
   type = string
-  default = "~/work/workdata/docker-desktop/k8s-pv"
+  default = "~/work/workdata/docker-desktop/ghilbut/k8s-pv"
 }
 
-variable business_domain {
+variable domain_root {
   type = string
-  default = "ghilbut.com"
-}
-
-variable inhouse_domain {
-  type = string
-  default = "ghilbut.net"
+  default = "kubelik.io"
 }
 
 
@@ -59,22 +49,8 @@ variable github_personal_token {
 ##--------------------------------------------------------------
 ##  cert-manager
 
-variable aws_region {
-  type = string
-  default = "ap-northeast-2"
-}
-
-variable aws_iam_letsencrypt {
-  type = object({ access_key = string, secret_key = string })
-}
-
 ##--------------------------------------------------------------
-##  ingress
-
-variable ingress_type {
-  type = string
-  default = "nginx"  // istio, nginx
-}
+##  ingress-nginx
 
 
 ################################################################
@@ -126,6 +102,16 @@ variable kafka_data_size {
   default = "4Gi"
 }
 
+variable kafka_persistence_enabled {
+  type = bool
+  default = false
+}
+
+variable kafka_replica_count {
+  type = number
+  default = 1
+}
+
 variable zookeeper_data_size {
   type = string
   default = "1Gi"
@@ -136,9 +122,14 @@ variable zookeeper_log_size {
   default = "4Gi"
 }
 
-variable kafka_persistence_enabled {
+variable zookeeper_persistence_enabled {
   type = bool
   default = false
+}
+
+variable zookeeper_replica_count {
+  type = number
+  default = 1
 }
 
 ##--------------------------------------------------------------

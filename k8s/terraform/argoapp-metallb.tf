@@ -17,7 +17,7 @@ resource null_resource metallb {
 data template_file metallb {
   template = <<-EOT
     kubectl \
-      --context ${var.k8s_context} \
+      --context docker-desktop \
       apply --validate=true \
             --wait=true \
             -f - <<EOF
@@ -28,8 +28,8 @@ data template_file metallb {
       name: metallb
       namespace: ${helm_release.argo.namespace}
       labels:
-        argo.${var.business_domain}/category: network
-        argo.${var.business_domain}/organization: system
+        argo.local.in/category: network
+        argo.local.in/organization: system
     spec:
       project: default
       source:

@@ -4,6 +4,27 @@ resource kubernetes_namespace mariadb {
   }
 }
 
+resource null_resource mariadb_pvs {
+  depends_on = [
+    kubernetes_namespace.mariadb,
+  ]
+
+  triggers = {
+    primary = "${var.k8s_pv_root}/mariadb/primary"
+    secondary = "${var.k8s_pv_root}/mariadb/secondary"
+  }
+
+  count = var.mariadb_persistence_enabled ? 1 : 0
+
+  provisioner local-exec {
+    command = <<-EOC
+      mkdir -p \
+        ${self.triggers.primary} \
+        ${self.triggers.secondary}
+      EOC
+  }
+}
+
 resource null_resource mariadb {
   triggers = {
     manifest = data.template_file.mariadb.rendered
@@ -17,7 +38,7 @@ resource null_resource mariadb {
 data template_file mariadb {
   template = <<-EOT
     kubectl \
-      --context ${var.k8s_context} \
+      --context docker-desktop \
       apply --validate=true \
             --wait=true \
             -f - <<EOF
@@ -28,8 +49,8 @@ data template_file mariadb {
       name: mariadb
       namespace: ${helm_release.argo.namespace}
       labels:
-        argo.${var.business_domain}/category: data
-        argo.${var.business_domain}/organization: platform
+        argo.local.in/category: data
+        argo.local.in/organization: platform
     spec:
       project: default
       source:
@@ -92,25 +113,4 @@ data template_file mariadb {
           - Validate=true
     EOF
   EOT
-}
-
-resource null_resource mariadb_pvs {
-  count = var.mariadb_persistence_enabled ? 1 : 0
-
-  depends_on = [
-    kubernetes_namespace.mariadb,
-  ]
-
-  triggers = {
-    primary = "${var.k8s_pv_root}/mariadb/primary"
-    secondary = "${var.k8s_pv_root}/mariadb/secondary"
-  }
-
-  provisioner local-exec {
-    command = <<-EOC
-      mkdir -p \
-        ${self.triggers.primary} \
-        ${self.triggers.secondary}
-      EOC
-  }
 }
