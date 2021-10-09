@@ -111,6 +111,10 @@ data template_file argo {
                 ingress:
                   hosts:
                     - argo.${var.domain_root}
+                  tls:
+                    - hosts:
+                        - argo.${var.domain_root}
+                      secretName: argo-tls
                 config:
                   url: https://argo.${var.domain_root}
             ---
