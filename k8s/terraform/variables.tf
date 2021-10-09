@@ -18,6 +18,12 @@ variable inhouse_domain {
   default = "ghilbut.net"
 }
 
+
+################################################################
+##
+##  operator
+##
+
 ##--------------------------------------------------------------
 ##  argo project
 
@@ -43,6 +49,30 @@ variable github_ssh_privatekey_path {
 variable github_personal_token {
   type = string
 }
+
+
+################################################################
+##
+##  network
+##
+
+##--------------------------------------------------------------
+##  cert-manager
+
+variable aws_region {
+  type = string
+  default = "ap-northeast-2"
+}
+
+variable aws_iam_letsencrypt {
+  type = object({ access_key = string, secret_key = string })
+}
+
+
+################################################################
+##
+##  data
+##
 
 ##--------------------------------------------------------------
 ##  cassandra
