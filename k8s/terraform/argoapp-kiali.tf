@@ -5,6 +5,8 @@ resource kubernetes_namespace kiali {
 }
 
 resource null_resource kiali {
+  count = var.ingress_type == "istio" ? 1 : 0
+
   triggers = {
     manifest = data.template_file.kiali.rendered
   }
