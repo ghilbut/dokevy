@@ -11,17 +11,22 @@ spec:
     privateKeySecretRef:
       name: letsencrypt
     solvers:
-    - selector:
-        dnsZones:
-        - ghilbut.com
-        - ghilbut.net
-        - polykube.io
-        - polykube.in
-        - polykube.net
-      dns01:
-        route53:
-          region: {{ .Values.aws.region }}
-          accessKeyID: {{ .Values.aws.access_key }}
-          secretAccessKeySecretRef:
-            name: aws-credential-secret
-            key:  secret-access-key
+      - selector:
+          - dnsZones:
+              - ghilbut.com
+              - polykube.io
+        http01:
+          ingress:
+            class: istio
+      - selector:
+          dnsZones:
+            - ghilbut.net
+            - polykube.in
+            - polykube.net
+        dns01:
+          route53:
+            region: {{ .Values.aws.region }}
+            accessKeyID: {{ .Values.aws.access_key }}
+            secretAccessKeySecretRef:
+              name: aws-credential-secret
+              key:  secret-access-key
