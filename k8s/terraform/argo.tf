@@ -48,6 +48,11 @@ resource helm_release argo {
     "${file("../helm/operator/argo/values.yaml")}",
   ]
 
+  set {
+    name  = "cd.server.ingress.hosts[0]"
+    value = "argo.${var.inhouse_domain}"
+  }
+
   set_sensitive {
     name  = "cd.configs.secret.argocdServerAdminPassword"
     value = data.external.argo_admin.result.encpw

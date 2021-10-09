@@ -32,7 +32,9 @@ cd:
     #    memory: 64Mi
     ingress:
       enabled: true
-      ingressClassName: istio
+      annotations:
+        kubernetes.io/ingress.class: istio
+      #ingressClassName: istio
       hosts:
         - argo.local.in
       paths:
