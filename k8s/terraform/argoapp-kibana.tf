@@ -57,12 +57,20 @@ data template_file kibana {
             ingress:
               enabled: true
               annotations:
-                #kubernetes.io/ingress.class: nginx
-                kubernetes.io/ingress.class: istio
+                %{ if var.ingress_type == "nginx" ~}
+                cert-manager.io/cluster-issuer: letsencrypt
+                %{ endif ~}
+                kubernetes.io/ingress.class: ${var.ingress_type}
               hosts:
                 - host: kibana.${var.inhouse_domain}
                   paths:
-                    - path: /*
+                    - path: %{ if var.ingress_type == "nginx" } / %{ else } /* %{ endif }
+              %{ if var.ingress_type == "nginx" ~}
+              tls:
+                - secretName: kibana-tls
+                  hosts:
+                    - kibana.${var.inhouse_domain}
+              %{ endif ~}
             ---
           valueFiles:
             - values.yaml

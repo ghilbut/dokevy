@@ -5,6 +5,8 @@ resource kubernetes_namespace istio {
 }
 
 resource null_resource istio {
+  count = var.ingress_type == "istio" ? 1 : 0
+
   triggers = {
     manifest = data.template_file.istio.rendered
   }

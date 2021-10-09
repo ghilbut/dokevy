@@ -68,6 +68,14 @@ variable aws_iam_letsencrypt {
   type = object({ access_key = string, secret_key = string })
 }
 
+##--------------------------------------------------------------
+##  ingress
+
+variable ingress_type {
+  type = string
+  default = "nginx"  // istio, nginx
+}
+
 
 ################################################################
 ##

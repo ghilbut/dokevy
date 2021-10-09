@@ -5,7 +5,7 @@ resource kubernetes_namespace nginx {
 }
 
 resource null_resource nginx {
-  count = 0
+  count = var.ingress_type == "nginx" ? 1 : 0
 
   triggers = {
     manifest = data.template_file.nginx.rendered
