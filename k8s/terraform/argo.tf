@@ -55,7 +55,7 @@ resource helm_release argo {
 
   set {
     name  = "cd.server.config.url"
-    value = "argo.${var.domain_root}"
+    value = "https://argo.${var.domain_root}"
   }
 
   set_sensitive {

@@ -32,9 +32,9 @@ kafka:
 ingress:
   enabled: true
   annotations:
-    kubernetes.io/ingress.class: istio
-  ingressClassName: istio
+    kubernetes.io/ingress.class: nginx
+  ingressClassName: nginx
   hosts:
     - kafka.local.in
   paths:
-    - /*
+    - /
