@@ -41,8 +41,7 @@ data template_file kiali {
             server:
               server:
                 istio_namespace: ${kubernetes_namespace.istio.metadata[0].name}
-                server:
-                  web_fqdn: ${var.inhouse_domain}
+                web_fqdn: kiali.${var.inhouse_domain}
             ---
           valueFiles:
             - values.yaml
