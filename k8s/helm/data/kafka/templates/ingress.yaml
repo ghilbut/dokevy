@@ -28,7 +28,7 @@ spec:
     secretName: {{ .secretName }}
     {{- end }}
   {{- else }}
-  {{ toYaml .Values.ingress.tls | indent 4 }}
+{{ toYaml .Values.ingress.tls | indent 4 }}
   {{- end }}
   {{- end }}
   rules:
