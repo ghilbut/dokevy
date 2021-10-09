@@ -19,7 +19,17 @@ spec:
   ingressClassName: {{ .Values.ingress.ingressClassName }}
   {{- if .Values.ingress.tls }}
   tls:
-    {{ toYaml .Values.ingress.tls | indent 4 }}
+  {{- if .ingressPath }}
+  {{- range .Values.ingress.tls }}
+  - hosts:
+    {{- range .hosts }}
+    - {{ . }}
+    {{- end }}
+    secretName: {{ .secretName }}
+    {{- end }}
+  {{- else }}
+  {{ toYaml .Values.ingress.tls | indent 4 }}
+  {{- end }}
   {{- end }}
   rules:
   {{- if .Values.ingress.hosts }}
