@@ -57,6 +57,10 @@ data template_file kafka {
             ingress:
               hosts:
                 - kafka.${var.domain_root}
+              tls:
+                - hosts:
+                    - kafka.${var.domain_root}
+                  secretName: kafka-tls
             ---
           valueFiles:
             - values.yaml

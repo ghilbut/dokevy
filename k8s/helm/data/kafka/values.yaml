@@ -38,3 +38,7 @@ ingress:
     - kafka.local.in
   paths:
     - /
+  tls:
+    - hosts:
+        - kafka.local.in
+      secretName: kafka-tls

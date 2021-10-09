@@ -57,11 +57,16 @@ data template_file kibana {
             ingress:
               enabled: true
               annotations:
+                cert-manager.io/cluster-issuer: letsencrypt
                 kubernetes.io/ingress.class: nginx
               hosts:
                 - host: kibana.${var.domain_root}
                   paths:
                     - path: /
+              tls:
+                - hosts:
+                    - kibana.${var.domain_root}
+                  secretName: kibana-tls
             ---
           valueFiles:
             - values.yaml
