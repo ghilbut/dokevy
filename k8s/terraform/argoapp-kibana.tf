@@ -17,7 +17,7 @@ resource null_resource kibana {
 data template_file kibana {
   template = <<-EOT
     kubectl \
-      --context docker-desktop \
+      --context ${var.k8s_context.name} \
       apply --validate=true \
             --wait=true \
             -f - <<EOF
@@ -28,8 +28,8 @@ data template_file kibana {
       name: kibana
       namespace: ${helm_release.argo.namespace}
       labels:
-        argo.local.in/category: observer
-        argo.local.in/organization: platform
+        argo.${var.domain_root}/category: observer
+        argo.${var.domain_root}/organization: platform
     spec:
       project: default
       source:

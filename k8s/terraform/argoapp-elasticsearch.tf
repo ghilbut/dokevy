@@ -28,8 +28,8 @@ data template_file elasticsearch {
       name: elasticsearch
       namespace: ${helm_release.argo.namespace}
       labels:
-        argo.local.in/category: data
-        argo.local.in/organization: platform
+        argo.${var.domain_root}/category: data
+        argo.${var.domain_root}/organization: platform
     spec:
       project: default
       source:

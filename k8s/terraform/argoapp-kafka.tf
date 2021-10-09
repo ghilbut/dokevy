@@ -23,7 +23,7 @@ resource null_resource kafka {
 data template_file kafka {
   template = <<-EOT
     kubectl \
-      --context docker-desktop \
+      --context ${var.k8s_context.name} \
       apply --validate=true \
             --wait=true \
             -f - <<EOF
@@ -34,8 +34,8 @@ data template_file kafka {
       name: kafka
       namespace: ${helm_release.argo.namespace}
       labels:
-        argo.local.in/category: data
-        argo.local.in/organization: platform
+        argo.${var.domain_root}/category: data
+        argo.${var.domain_root}/organization: platform
     spec:
       project: default
       source:
@@ -211,7 +211,7 @@ resource kubernetes_persistent_volume zookeeper_log {
 }
 
 resource null_resource zookeeper_log_path {
-  count = var.zookeeper_persistence_enabled ? var.zookeeper_replica_count ? 0
+  count = var.zookeeper_persistence_enabled ? var.zookeeper_replica_count : 0
 
   depends_on = [
     kubernetes_namespace.kafka,

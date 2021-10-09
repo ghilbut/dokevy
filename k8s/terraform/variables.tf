@@ -1,3 +1,11 @@
+variable k8s_context {
+  type = object({ path = string, name = string })
+  default = {
+    path = "~/.kube/config"
+    name = "docker-desktop"
+  }
+}
+
 variable k8s_pv_root {
   type = string
   default = "~/work/workdata/docker-desktop/ghilbut/k8s-pv"
@@ -6,6 +14,15 @@ variable k8s_pv_root {
 variable domain_root {
   type = string
   default = "kubelik.io"
+}
+
+variable aws_region {
+  type = string
+  default = "ap-northeast-2"
+}
+
+variable aws_iam_letsencrypt {
+  type = object({ access_key = string, secret_key = string })
 }
 
 

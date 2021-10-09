@@ -17,7 +17,7 @@ resource null_resource beats {
 data template_file beats {
   template = <<-EOT
     kubectl \
-      --context docker-desktop \
+      --context ${var.k8s_context.name} \
       apply --validate=true \
             --wait=true \
             -f - <<EOF
@@ -28,8 +28,8 @@ data template_file beats {
       name: elastic-beats
       namespace: ${helm_release.argo.namespace}
       labels:
-        argo.local.in/category: observer
-        argo.local.in/organization: system
+        argo.${var.domain_root}/category: observer
+        argo.${var.domain_root}/organization: system
     spec:
       project: default
       source:

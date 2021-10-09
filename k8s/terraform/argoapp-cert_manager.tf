@@ -44,7 +44,7 @@ resource null_resource cert-manager {
 data template_file cert-manager {
   template = <<-EOT
     kubectl \
-        --context ${var.k8s_context} \
+      --context ${var.k8s_context.name} \
       apply \
         --validate=true \
         --wait=true \
@@ -56,8 +56,8 @@ data template_file cert-manager {
       name: cert-manager
       namespace: ${kubernetes_namespace.argo.metadata[0].name}
       labels:
-        argo.${var.business_domain}/category: network
-        argo.${var.business_domain}/organization: plarform
+        argo.${var.domain_root}/category: network
+        argo.${var.domain_root}/organization: plarform
     spec:
       project: default
       source:

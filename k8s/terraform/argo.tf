@@ -85,7 +85,7 @@ resource null_resource argo {
 data template_file argo {
   template = <<-EOT
     kubectl \
-      --context docker-desktop \
+      --context ${var.k8s_context.name} \
       apply --validate=true \
             --wait=true \
             -f - <<EOF
@@ -96,8 +96,8 @@ data template_file argo {
       name: argo
       namespace: ${helm_release.argo.namespace}
       labels:
-        argo.local.in/category: operator
-        argo.local.in/organization: plarform
+        argo.${var.domain_root}/category: operator
+        argo.${var.domain_root}/organization: plarform
     spec:
       project: default
       source:

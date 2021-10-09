@@ -11,13 +11,13 @@ terraform {
 
 
 provider kubernetes {
-  config_path    = "~/.kube/config"
-  config_context = "docker-desktop"
+  config_path    = var.k8s_context.path
+  config_context = var.k8s_context.name
 }
 
 provider helm {
   kubernetes {
-    config_path    = "~/.kube/config"
-    config_context = "docker-desktop"
+    config_path    = var.k8s_context.path
+    config_context = var.k8s_context.name
   }
 }
