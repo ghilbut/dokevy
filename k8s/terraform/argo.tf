@@ -119,6 +119,7 @@ data template_file argo {
                   tls:
                     - hosts:
                         - argo.${var.domain_root}
+                      secretName: argo-tls
                 config:
                   url: https://argo.${var.domain_root}
             ---
