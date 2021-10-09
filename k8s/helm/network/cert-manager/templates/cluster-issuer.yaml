@@ -18,7 +18,7 @@ spec:
             - polykube.io
         http01:
           ingress:
-            class: istio
+            class: nginx
       - selector:
           dnsZones:
             - ghilbut.net

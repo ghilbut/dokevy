@@ -106,6 +106,10 @@ data template_file argo {
                 ingress:
                   hosts:
                     - argo.${var.inhouse_domain}
+                  tls:
+                    - hosts:
+                        - argo.${var.inhouse_domain}
+                      secretName: argo-tls
             ---
           valueFiles:
             - values.yaml
