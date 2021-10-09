@@ -38,6 +38,10 @@ cd:
       #ingressClassName: nginx
       hosts:
         - argo.local.in
+      tls:
+        - hosts:
+            - argo.local.in
+          secretName: argo-tls
     config:
       url: https://argo.local.in
       repositories: |

@@ -54,6 +54,11 @@ resource helm_release argo {
   }
 
   set {
+    name  = "cd.server.ingress.tls[0].hosts[0]"
+    value = "argo.${var.domain_root}"
+  }
+
+  set {
     name  = "cd.server.config.url"
     value = "https://argo.${var.domain_root}"
   }
@@ -114,7 +119,6 @@ data template_file argo {
                   tls:
                     - hosts:
                         - argo.${var.domain_root}
-                      secretName: argo-tls
                 config:
                   url: https://argo.${var.domain_root}
             ---
