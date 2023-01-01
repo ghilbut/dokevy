@@ -1,0 +1,36 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cert-manager
+  namespace: argo
+  labels:
+    ghilbut.com/category: security
+    ghilbut.com/organization: ghilbut
+spec:
+  project: default
+  source:
+    ## https://github.com/jetstack/cert-manager  //deploy/charts/cert-manager/
+    repoURL: https://charts.jetstack.io/
+    chart: cert-manager
+    targetRevision: v1.10.1
+    helm:
+      values: |
+        fullnameOverride: cert-manager
+        prometheus:
+          enabled: false
+        installCRDs: true
+        ---
+      valueFiles:
+        - values.yaml
+      version: v3
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: cert-manager
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - Validate=true
+  revisionHistoryLimit: 1
+---

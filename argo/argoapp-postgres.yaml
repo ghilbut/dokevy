@@ -1,0 +1,26 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: postgres
+  namespace: argo
+  labels:
+    ghilbut.com/category: db
+    ghilbut.com/organization: ghilbut
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/ghilbut/docker-desktop.git
+    targetRevision: refactoring
+    path: helm/postgres
+    directory:
+      recurse: true
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: postgres
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - Validate=true
+  revisionHistoryLimit: 1

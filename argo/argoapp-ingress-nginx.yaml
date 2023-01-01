@@ -1,0 +1,42 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ingress-nginx
+  namespace: argo
+  labels:
+    ghilbut.com/category: network
+    ghilbut.com/organization: ghilbut
+spec:
+  project: default
+  source:
+    ## https://github.com/kubernetes/ingress-nginx  //charts/ingress-nginx/
+    repoURL: https://kubernetes.github.io/ingress-nginx/
+    chart: ingress-nginx
+    targetRevision: 4.4.0
+    helm:
+      values: |
+        fullnameOverride: nginx
+        controller:
+          ingressClassByName: true
+          electionID: cc0ed9fa5e47d844
+          ingressClassResource:
+            name: nginx
+            controllerValue: k8s.io/nginx
+          replicaCount: 1
+          minAvailable: 1
+          service:
+            externalTrafficPolicy: Local
+        ---
+      valueFiles:
+        - values.yaml
+      version: v3
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: ingress-nginx
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - Validate=true
+---

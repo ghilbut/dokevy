@@ -1,6 +1,0 @@
-cert-manager:
-  installCRDs: true
-
-aws:
-  region:   ""
-  access_key: ""

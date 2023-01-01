@@ -1,0 +1,44 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argo
+  namespace: argo
+  labels:
+    ghilbut.com/category: operator
+    ghilbut.com/organization: ghilbut
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/ghilbut/docker-desktop.git
+    targetRevision: refactoring
+    path: helm/argo/
+    helm:
+      values: |
+        cd:
+          server:
+            ingress:
+              enabled: true
+              annotations:
+                cert-manager.io/cluster-issuer: letsencrypt
+              ingressClassName: nginx
+              hosts:
+                - argo.ghilbut.net
+              paths:
+                - /
+              tls:
+                - hosts:
+                    - argo.ghilbut.net
+                  secretName: argo-server-tls
+              https: true
+        ---
+      valueFiles:
+        - values.yaml
+      version: v3
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argo
+  syncPolicy:
+    syncOptions:
+      - Validate=true
+  revisionHistoryLimit: 1
+---

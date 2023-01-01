@@ -1,0 +1,79 @@
+cd:
+  fullnameOverride: argo
+
+  # controller:
+  #   envFrom:
+  #     - configMapRef:
+  #         name: proxy-environment-variables
+
+  dex:
+    enabled: false
+
+  server:
+    extraArgs:
+      - --insecure
+    # envFrom:
+    #   - configMapRef:
+    #       name: proxy-environment-variables
+    # resources:
+    #   limits:
+    #     cpu: 100m
+    #     memory: 128Mi
+    #   requests:
+    #     cpu: 50m
+    #     memory: 64Mi
+    ingress:
+      enabled: false
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt
+      ingressClassName: nginx
+      hosts:
+        - argo.dokevy.in
+      paths:
+        - /
+      tls:
+        - hosts:
+            - argo.dokevy.in
+          secretName: argo-server-tls
+      https: true
+    config:
+      url: https://argo.ultary.co
+      #admin.enabled: "false"
+      accounts.deploy: apiKey, login
+      accounts.deploy.enabled: "true"
+      # oidc.config: |
+      #   name:         Ultary SSO
+      #   issuer:       https://dex.ultary.co
+      #   clientID:     $oidc.clientID
+      #   clientSecret: $oidc.clientSecret
+      #   redirectURI:  https://argo.ultary.co/auth/callback
+      #   requestedScopes:        ["openid", "profile", "email", "groups"]
+      #   requestedIDTokenClaims: {"groups": {"essential": true}}
+    ## https://argoproj.github.io/argo-cd/operator-manual/rbac/
+    rbacConfig:
+      policy.csv: |
+        g, jhkim@ultary.co, role:admin
+        
+        p, deploy,  applications,  update,  *,             allow
+        p, deploy,  applications,  *,       default/argo,  deny
+        
+        p, role:ultary,     applications,  *,  ultary/*,     allow
+        p, role:incubator,  applications,  *,  incubator/*,  allow
+      policy.default: role:readonly
+      # policy.default: role:incubator
+      # scopes: '[email, group]'
+
+  # repoServer:
+  #   envFrom:
+  #     - configMapRef:
+  #         name: proxy-environment-variables
+
+  configs:
+    secret:
+      argocdServerAdminPassword: "$2a$10$NrmSwagFuU9LW9QdilTgkOysxDFR6/vM.rRwu77aQ1jO1dkG5hFD."
+      argocdServerAdminPasswordMtime: 2022-10-13T00:00:00Z
+      # extra:
+      #   accounts.deploy.password: "$2a$10$PVpSmRFOYLc9rc9ZYsR.Xeokrg4kwax1KZRRJtkIsDf4g91wpiQTa"
+      #   accounts.deploy.passwordMtime: "2021-05-24T01:00:00Z"
+      #   oidc.clientID: argo.ultary.co
+      #   oidc.clientSecret: ""

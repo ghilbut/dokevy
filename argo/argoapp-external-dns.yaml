@@ -1,0 +1,69 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: external-dns
+  namespace: argo
+  labels:
+    ghilbut.com/category: network
+    ghilbut.com/organization: ghilbut
+spec:
+  project: default
+  source:
+    ## https://github.com/kubernetes-sigs/external-dns  //charts/external-dns/
+    repoURL: https://kubernetes-sigs.github.io/external-dns/
+    chart: external-dns
+    targetRevision: 1.11.0
+    helm:
+      values: |
+        fullnameOverride: external-dns
+        env:
+          - name: AWS_DEFAULT_REGION
+            value: ap-northeast-2
+          - name: AWS_SHARED_CREDENTIALS_FILE
+            value: /.aws/credentials
+          # - name: HTTP_PROXY
+          #   value: ${local.http_proxy}
+          # - name: HTTPS_PROXY
+          #   value: ${local.http_proxy}
+          # - name: NO_PROXY
+          #   value: ${local.no_proxy}
+        extraVolumes:
+          - name: aws-credentials
+            secret:
+              secretName: external-dns-files
+        extraVolumeMounts:
+          - name: aws-credentials
+            mountPath: /.aws
+            readOnly: true
+        policy: sync
+        registry: txt
+        txtOwnerId: docker-desktop
+        txtPrefix:  ghilbut-
+        domainFilters:
+          - ghilbut.com
+          - ghilbut.net
+        provider: aws
+        extraArgs:
+          - --annotation-filter=external-dns.alpha.kubernetes.io/exclude notin (true)
+        ---
+      valueFiles:
+        - values.yaml
+      version: v3
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: external-dns
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - Validate=true
+  # ignoreDifferences:
+  #   - group: rbac.authorization.k8s.io
+  #     kind: ClusterRole
+  #     name: external-dns
+  #   - group: rbac.authorization.k8s.io
+  #     kind: ClusterRoleBinding
+  #     name: external-dns
+  revisionHistoryLimit: 1
+---

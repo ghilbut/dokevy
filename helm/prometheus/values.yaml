@@ -1,0 +1,43 @@
+################################################################
+##
+##  Helm Chart values
+##
+
+##--------------------------------------------------------------
+##  prometheus
+
+prometheus:
+  alertmanager:
+    fullnameOverride: alertmanager
+    persistentVolume:
+      existingClaim: alertmanager
+  configmapReload:
+    fullnameOverride: configmap-reload
+  kube-state-metrics:
+    fullnameOverride: kube-state-metrics
+  prometheus-node-exporter:
+    fullnameOverride: node-exporter
+    hostRootFsMount:
+      mountPropagation: None
+    tolerations:
+      - operator: Exists
+  server:
+    fullnameOverride: server
+    persistentVolume:
+      existingClaim: server
+    ingress:
+      enabled: true
+      ingressClassName: nginx
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt
+      hosts:
+        - metrics.ghilbut.net
+      tls:
+        - secretName: prometheus-server-tls
+          hosts:
+            - metrics.ghilbut.net
+  prometheus-pushgateway:
+    fullnameOverride: pushgateway
+    persistentVolume:
+      enabled: true
+      existingClaim: pushgateway

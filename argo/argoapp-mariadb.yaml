@@ -1,0 +1,28 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: mariadb
+  namespace: argo
+  labels:
+    ghilbut.com/category: db
+    ghilbut.com/organization: ghilbut
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/ghilbut/docker-desktop.git
+    targetRevision: refactoring
+    path: helm/mariadb
+    helm:
+      valueFiles:
+        - values.yaml
+      version: v3
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: mariadb
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - Validate=true
+  revisionHistoryLimit: 1
