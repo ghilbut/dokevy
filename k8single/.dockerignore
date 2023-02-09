@@ -1,0 +1,6 @@
+.venv
+.dockerignore
+.gitignore
+db.sqlite3
+Dockerfile
+Dockerfile.release
