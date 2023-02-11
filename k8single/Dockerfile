@@ -4,10 +4,11 @@ FROM --platform=$BUILDPLATFORM python:3.11.2-slim AS base
 
 WORKDIR /app
 
-ENV LANG   C.UTF-8
-ENV LC_ALL C.UTF-8
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONFAULTHANDLER      1
+ENV LANG=C.UTF-8 \
+    LC_ALL=C.UTF-8 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONFAULTHANDLER=1 \
+    PYTHONUNBUFFERED=1
 
 
 FROM base AS deps
@@ -33,7 +34,10 @@ FROM base AS release
 LABEL maintainer="ghilbut@gmail.com"
 LABEL repository="https://github.com/ghilbut/docker-desktop"
 
+ENV DJANGO_SETTINGS_MODULE=k8single.settings.production \
+    PYTHONDONTWRITEBYTECODE=0
 EXPOSE 8000
+VOLUME /app/static
 
 COPY --from=deps /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
 COPY --from=deps /usr/local/bin/uvicorn /usr/local/bin/uvicorn

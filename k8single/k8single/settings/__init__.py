@@ -115,7 +115,9 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
+STATIC_ROOT = BASE_DIR / 'static'
 STATIC_URL = 'static/'
+STATICFILES_DIRS = []
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
@@ -123,7 +125,73 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-STATIC_ROOT = BASE_DIR / 'static'
-STATICFILES_DIRS = []
+################################################################
+#
+#  Elastic-APM
+#    * https://www.elastic.co/guide/en/apm/agent/python/6.x/django-support.html
+#
 
-print(f'STATIC_ROOT: {STATIC_ROOT}')
+INSTALLED_APPS.append('elasticapm.contrib.django')
+MIDDLEWARE.append('elasticapm.contrib.django.middleware.Catch404Middleware')
+TEMPLATES[0]['OPTIONS']['context_processors'].append('elasticapm.contrib.django.context_processors.rum_tracing')
+
+## https://docs.djangoproject.com/en/4.1/topics/logging/
+## https://www.elastic.co/guide/en/apm/agent/python/6.x/django-support.html#django-logging
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': True,
+    'formatters': {
+        'verbose': {
+            'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+        },
+    },
+    'handlers': {
+        'elasticapm': {
+            'level': 'WARNING',
+            'class': 'elasticapm.contrib.django.handlers.LoggingHandler',
+        },
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose'
+        }
+    },
+    'loggers': {
+        'django': {
+            'level': 'INFO',
+            'handlers': ['console'],
+            'propagate': True,
+        },
+        'django.db.backends': {
+            'level': 'WARNING',
+            'handlers': ['console'],
+            'propagate': False,
+        },
+        # Log errors from the Elastic APM module to the console (recommended)
+        'elasticapm.errors': {
+            'level': 'WARNING',
+            'handlers': ['console'],
+            'propagate': False,
+        },
+        'k8single': {
+            'level': 'DEBUG',
+            'handlers': ['elasticapm'],
+            'propagate': False,
+        },
+    },
+}
+
+## https://www.elastic.co/guide/en/apm/agent/python/6.x/configuration.html
+ELASTIC_APM = {
+    'SERVICE_NAME': 'k8single',
+    'SERVER_URL': os.environ.get('ELASTIC_APM_SERVER_URL', 'http://localhost:8200'),
+    'ENABLED': os.environ.get('ELASTIC_APM_ENABLED', False),
+    'LOG_LEVEL': 'warning',
+    'SERVICE_NODE_NAME': os.environ.get('ELASTIC_APM_SERVICE_NODE_NAME', 'localhost'),
+    'ENVIRONMENT': os.environ.get('ELASTIC_APM_ENVIRONMENT', 'unknown'),
+    'CLOUD_PROVIDER': os.environ.get('ELASTIC_APM_CLOUD_PROVIDER', 'none'),
+    'SERVICE_VERSION': 'v0.1',
+    'TRANSACTION_IGNORE_URLS': ['/ready', '/healthz', '/metrics', '/static/*'],
+    'TRANSACTIONS_IGNORE_PATTERNS': ['^OPTIONS '],
+    'DJANGO_TRANSACTION_NAME_FROM_ROUTE': True,
+}
