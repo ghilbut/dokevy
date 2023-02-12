@@ -75,8 +75,13 @@ WSGI_APPLICATION = 'k8single.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'OPTIONS': {},
+        'NAME': 'k8single',
+        'USER': 'k8single',
+        'PASSWORD': 'k8single',
+        'HOST': '127.0.0.1',
+        'PORT': '3306',
     }
 }
 
