@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en-US" dir="ltr">
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    {% load i18n %}
+
+    <!-- ===============================================--><!--    Document Title--><!-- ===============================================-->
+    <title>{% block head_title %}{% trans "Falcon | Dashboard &amp; Web App Template" %}{% endblock %}</title>
+
+    {% load static %}
+
+    <!-- Elastic-APM RUM -->
+    <script src="{% static 'js/elastic-apm-rum.umd.min.js' %}" crossorigin></script>
+    <script>
+      // https://www.elastic.co/guide/en/apm/agent/rum-js/5.x/configuration.html
+      elasticApm.init({
+        serviceName: "jhkim",
+        serverUrl: 'https://lunit.apm.asia-northeast1.gcp.cloud.es.io',
+        environment: 'localhost',
+        pageLoadTraceId: "{{ apm.trace_id }}",
+        pageLoadSpanId: "{{ apm.span_id }}",
+        pageLoadSampled: {{ apm.is_sampled_js }}
+      });
+    </script>
+
+    <!-- ===============================================--><!--    Favicons--><!-- ===============================================-->
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'falcon/assets/img/favicons/apple-touch-icon.png' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'falcon/assets/img/favicons/favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'falcon/assets/img/favicons/favicon-16x16.png' %}">
+    <link rel="shortcut icon" type="image/x-icon" href="{% static 'falcon/assets/img/favicons/favicon.ico' %}">
+    <link rel="manifest" href="{% static 'falcon/assets/img/favicons/manif:est.json' %}">
+    <meta name="msapplication-TileImage" content="{% static 'falcon/assets/img/favicons/mstile-150x150.png' %}">
+    <meta name="theme-color" content="#ffffff">
+    <script src="{% static 'falcon/assets/js/config.js' %}"></script>
+    <script src="{% static 'falcon/vendors/simplebar/simplebar.min.js' %}"></script>
+
+    <!-- ===============================================--><!--    Stylesheets--><!-- ===============================================-->
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,500,600,700%7cPoppins:300,400,500,600,700,800,900&amp;display=swap" rel="stylesheet">
+    <link href="{% static 'falcon/vendors/simplebar/simplebar.min.css' %}" rel="stylesheet">
+    <link href="{% static 'falcon/assets/css/theme-rtl.min.css' %}" rel="stylesheet" id="style-rtl">
+    <link href="{% static 'falcon/assets/css/theme.min.css' %}" rel="stylesheet" id="style-default">
+    <link href="{% static 'falcon/assets/css/user-rtl.min.css' %}" rel="stylesheet" id="user-style-rtl">
+    <link href="{% static 'falcon/assets/css/user.min.css' %}" rel="stylesheet" id="user-style-default">
+  </head>
+
+  <body>
+    <!-- ===============================================--><!--    Main Content--><!-- ===============================================-->
+    <main class="main" id="top">
+
+    {% block content %}
+    {% endblock %}
+
+    {% block extra_body %}
+    {% endblock %}
+
+    </main><!-- ===============================================--><!--    End of Main Content--><!-- ===============================================-->
+
+    {% include 'includes/customize.html' %}
+
+    <!-- ===============================================--><!--    JavaScripts--><!-- ===============================================-->
+    <script src="{% static 'falcon/vendors/popper/popper.min.js' %}"></script>
+    <script src="{% static 'falcon/vendors/bootstrap/bootstrap.min.js' %}"></script>
+    <script src="{% static 'falcon/vendors/anchorjs/anchor.min.js' %}"></script>
+    <script src="{% static 'falcon/vendors/is/is.min.js' %}"></script>
+    <script src="{% static 'falcon/vendors/echarts/echarts.min.js' %}"></script>
+    <script src="{% static 'falcon/vendors/fontawesome/all.min.js' %}"></script>
+    <script src="{% static 'falcon/vendors/lodash/lodash.min.js' %}"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=window.scroll"></script>
+    <script src="{% static 'falcon/vendors/list.js/list.min.js' %}"></script>
+    <script src="{% static 'falcon/assets/js/theme.js' %}"></script>
+
+    {% block extra_scripts %}
+    {% endblock %}
+
+  </body>
+</html>
