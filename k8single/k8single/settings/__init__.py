@@ -37,6 +37,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    ## ---- external pakcages ----
+    ## ---- project packages ----
+    'apps.terraform_states',
 ]
 
 MIDDLEWARE = [

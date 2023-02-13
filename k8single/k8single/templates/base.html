@@ -18,9 +18,7 @@
     <script>
       // https://www.elastic.co/guide/en/apm/agent/rum-js/5.x/configuration.html
       elasticApm.init({
-        serviceName: "jhkim",
-        serverUrl: 'https://lunit.apm.asia-northeast1.gcp.cloud.es.io',
-        environment: 'localhost',
+        serviceName: 'k8single',
         pageLoadTraceId: "{{ apm.trace_id }}",
         pageLoadSpanId: "{{ apm.span_id }}",
         pageLoadSampled: {{ apm.is_sampled_js }}
