@@ -1,6 +1,7 @@
-from django.http import HttpResponse, HttpResponseNotAllowed
+import json
+from django.http import HttpResponse, HttpResponseNotAllowed, HttpResponseNotFound
 from http import HTTPMethod, HTTPStatus
-from . import models
+from .models import State
 
 
 def list(request):
@@ -10,19 +11,24 @@ def list(request):
 def item(request, name):
 
     method = request.method
-    print(method)
 
-    if method in {HTTPMethod.GET, str(HTTPMethod.POST), 'LOCK', 'UNLOCK'}:
+    if method in {HTTPMethod.POST, 'LOCK', 'UNLOCK'}:
         return __not_implemented__(request)
 
-    if request.method == 'GET':
+    if method == HTTPMethod.GET:
         return __get__(request, name)
 
     return HttpResponseNotAllowed(method)
 
 
 def __get__(request, name):
-    pass
+    try:
+        q = State.objects.get(name=name)
+        print(json.dumps(q.state, indent=4))
+    except State.DoesNotExist:
+        return HttpResponseNotFound()
+
+    return HttpResponse('OK')
 
 
 def __not_implemented__(request):
