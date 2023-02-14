@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+
+{% load static %}
+
+
+{% block content %}
+
+<div class="card mb-3">
+    <div class="card-header">
+        <div class="row flex-between-end">
+            <div class="col-auto align-self-center">
+                <h5 class="mb-0" data-anchor="data-anchor" id="basic-form">Create terraform state<a class="anchorjs-link " aria-label="Anchor" data-anchorjs-icon="#" href="#basic-form" style="padding-left: 0.375em;"></a></h5>
+            </div>
+        </div>
+    </div>
+    <div class="card-body bg-light">
+        {% if error %}
+        <div class="alert alert-danger border-2 d-flex align-items-center" role="alert">
+            <div class="bg-danger me-3 icon-item"><span class="fas fa-times-circle text-white fs-3"></span></div>
+            <p class="mb-0 flex-1">{{ error }}</p>
+        </div>
+        {% endif %}
+        <div class="tab-content">
+            <div class="tab-pane preview-tab-pane active" role="tabpanel" aria-labelledby="tab-dom-1838e114-8c4d-49d7-a3bf-5895a1ec6924" id="dom-1838e114-8c4d-49d7-a3bf-5895a1ec6924">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label" for="terraform-state-name">Name</label>
+                        <input class="form-control" id="terraform-state-name" name="name" type="text" placeholder="Name" value="{{ name|default:'' }}">
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" id="terraform-state-readonly" type="checkbox" name="readonly" checked disabled />
+                        <label class="form-check-label" for="terraform-state-readonly">Only for terraform_remote_state</label>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="terraform-state-description">Description</label>
+                        <textarea class="form-control" id="terraform-state-description" name="desc" rows="3" placeholder="Description">{{ desc|default:'' }}</textarea>
+                    </div>
+                    <a class="btn btn-secondary" type="button" href="{% url 'terraform_states:list' %}">Cancel</a>
+                    <button class="btn btn-primary" type="submit">Create</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+
+{% block extra_scripts %}
+<script src="{% static 'falcon/vendors/prism/prism.js' %}"></script>
+{% endblock %}
