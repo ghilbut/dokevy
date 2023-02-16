@@ -1,20 +1,42 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"net/http/httputil"
 	// external packages
 	"github.com/gin-gonic/gin"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"go.elastic.co/apm/module/apmgin/v2"
+	"go.elastic.co/apm/v2"
 )
+
+func init() {
+	// NOTE(ghilbut): before running main
+	// can register prometheus custom metrics
+	//   * https://gabrieltanner.org/blog/collecting-prometheus-metrics-in-golang/
+}
 
 func main() {
 	r := gin.Default()
 	r.NoRoute(ReverseProxy())
+
+	r.Use(
+		apmgin.Middleware(r),
+	)
+
+	r.GET("/metrics", func() gin.HandlerFunc {
+		h := promhttp.Handler()
+		return func(c *gin.Context) {
+			h.ServeHTTP(c.Writer, c.Request)
+		}
+	}())
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "pong",
 		})
 	})
+
 	r.Run()
 }
 
@@ -23,6 +45,10 @@ func ReverseProxy() gin.HandlerFunc {
 	target := "localhost:3000"
 
 	return func(c *gin.Context) {
+		if tx := apm.TransactionFromContext(c.Request.Context()); tx != nil {
+			tx.Name = fmt.Sprintf("%s %s", c.Request.Method, c.Request.URL.Path)
+		}
+
 		director := func(req *http.Request) {
 			req.URL.Scheme = "http"
 			req.URL.Host = target
