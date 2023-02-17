@@ -1,0 +1,62 @@
+version: "3.9"
+networks:
+  default:
+    external: true
+    name: elastic
+services:
+  ## [elastic-apm] https://www.elastic.co/guide/en/apm/guide/8.6/running-on-docker.html
+  apm-server:
+    image: docker.elastic.co/apm/apm-server:${STACK_VERSION}
+    container_name: apm-server
+    command:
+      - --strict.perms=false
+      - -e
+      - -E
+      - output.elasticsearch.username=elastic
+      - -E
+      - output.elasticsearch.password=${ELASTIC_PASSWORD}
+      - -E
+      - output.elasticsearch.ssl.certificate_authorities=/etc/apm-server/certs/ca.crt
+      - -E
+      - logging.level=warning
+    environment:
+      - ELASTIC_PASSWORD
+    ports:
+      - 0.0.0.0:8200:8200
+    restart: always
+    user: apm-server
+    volumes:
+      - ./conf/apm-server.docker.yml:/usr/share/apm-server/apm-server.yml:ro
+      - .data/certs/ca:/etc/apm-server/certs:ro
+    # ## ERROR(ghilbut): there is not curl in container
+    # healthcheck:
+    #   test:
+    #     [
+    #       "CMD-SHELL",
+    #       "curl -s -I http://localhost:8200 | grep -q 'HTTP/1.1 200 OK'",
+    #     ]
+    #   start_period: 10s
+    #   interval: 10s
+    #   timeout: 10s
+    #   retries: 3
+
+  # ## [fleet] https://www.elastic.co/guide/en/fleet/8.6/elastic-agent-container.html
+  # ##         https://www.elastic.co/guide/en/fleet/8.6/add-fleet-server-on-prem.html
+  # fleet:
+  #   image: docker.elastic.co/beats/elastic-agent:${STACK_VERSION}
+  #   container_name: fleet
+  #   user: root
+  #   volumes:
+  #     - ./apm-server.docker.yml:/usr/share/apm-server/apm-server.yml:ro
+  #     - .data/certs/ca:/etc/elastic-agent/certs:ro
+  #   ports:
+  #     - 0.0.0.0:8220:8220
+  #   environment:
+  #     - FLEET_SERVER_ENABLE=true
+  #     - FLEET_SERVER_ELASTICSEARCH_HOST=https://es:9200
+  #     - FLEET_SERVER_ELASTICSEARCH_CA=/etc/elastic-agent/certs/ca.crt
+  #     - FLEET_SERVER_ELASTICSEARCH_USERNAME=elastic
+  #     - FLEET_SERVER_ELASTICSEARCH_PASSWORD=${ELASTIC_PASSWORD}
+  #     - FLEET_SERVER_SERVICE_TOKEN=AAEAAWVsYXN0aWMvZmxlZXQtc2VydmVyL3Rva2VuLTE2NzY2NTA1NDE2ODU6bHVOSnRqRzhTM3FFT2ZUYm9CbXVTQQ
+  #     - KIBANA_FLEET_SETUP=1
+  #     - KIBANA_HOST=http://kibana-proxy:5601
