@@ -127,8 +127,10 @@ apm-server:
   # Enable Real User Monitoring (RUM) Support. By default RUM is disabled.
   # RUM does not support token based authorization. Enabled RUM endpoints will not require any authorization
   # token configured for other endpoints.
-  #rum:
+  #rum
+  rum:
     #enabled: false
+    enabled: true
 
     #-- General RUM settings
 
@@ -137,7 +139,7 @@ apm-server:
     # An origin is made of a protocol scheme, host and port, without the url path.
     # Allowed origins in this setting can have * to match anything (eg.: http://*.example.com)
     # If an item in the list is a single '*', everything will be allowed.
-    #allow_origins: ['*']
+    allow_origins: ['*']
 
     # A list of Access-Control-Allow-Headers to allow RUM requests, in addition to "Content-Type",
     # "Content-Encoding", and "Accept"
@@ -149,19 +151,19 @@ apm-server:
 
     # Regexp to be matched against a stacktrace frame's `file_name` and `abs_path` attributes.
     # If the regexp matches, the stacktrace frame is considered to be a library frame.
-    #library_pattern: "node_modules|bower_components|~"
+    library_pattern: "node_modules|bower_components|~"
 
     # Regexp to be matched against a stacktrace frame's `file_name`.
     # If the regexp matches, the stacktrace frame is not used for calculating error groups.
     # The default pattern excludes stacktrace frames that have a filename starting with '/webpack'
-    #exclude_from_grouping: "^/webpack"
+    exclude_from_grouping: "^/webpack"
 
     # If a source map has previously been uploaded, source mapping is automatically applied.
     # to all error and transaction documents sent to the RUM endpoint.
-    #source_mapping:
+    source_mapping:
 
       # Sourcemapping is enabled by default.
-      #enabled: true
+      enabled: true
 
       # Timeout for fetching source maps.
       #timeout: 5s
@@ -194,7 +196,7 @@ apm-server:
         #password: "changeme"
 
       # Index pattern in which to search for source maps, when fetching source maps from Elasticsearch.
-      #index_pattern: "apm-*-sourcemap*"
+      index_pattern: "apm-*-sourcemap*"
 
   #---------------------------- APM Server - Agent Configuration ----------------------------
 

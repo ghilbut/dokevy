@@ -5,19 +5,18 @@ import styles from '@/styles/Home.module.css'
 
 import { useEffect } from 'react';
 import fetch from "node-fetch";
-import apm from "utils/apm-rum"
 import Link from "next/link";
 
 const inter = Inter({ subsets: ['latin'] })
 
-export default function Home() {
+export default function About() {
 
   useEffect(() => {
     fetch('/ping')
         .then((res) => res.json())
         .then((data) => console.log(data))
         .catch((err) => console.error(err))
-  })
+  }, [])
 
   return (
     <>
@@ -52,7 +51,7 @@ export default function Home() {
           </div>
         </div>
 
-        <Link href="/about">About</Link>
+        <Link href="/">Home</Link>
 
         <div className={styles.center}>
           <Image

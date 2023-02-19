@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"go.elastic.co/apm/module/apmhttp/v2"
 	"net/http"
 	"net/http/httputil"
 	// external packages
@@ -20,6 +21,7 @@ func init() {
 func main() {
 	r := gin.Default()
 	r.NoRoute(ReverseProxy())
+	r.SetTrustedProxies([]string{"localhost:3000"})
 
 	r.Use(
 		apmgin.Middleware(r),
@@ -42,17 +44,17 @@ func main() {
 
 func ReverseProxy() gin.HandlerFunc {
 
+	scheme := "http"
 	target := "localhost:3000"
 
 	return func(c *gin.Context) {
-		if tx := apm.TransactionFromContext(c.Request.Context()); tx != nil {
-			tx.Name = fmt.Sprintf("%s %s", c.Request.Method, c.Request.URL.Path)
-		}
-
 		director := func(req *http.Request) {
-			req.URL.Scheme = "http"
+			req.URL.Scheme = scheme
 			req.URL.Host = target
-			req.Header["my-header"] = []string{"Ghilbut"}
+			if tx := apm.TransactionFromContext(c.Request.Context()); tx != nil {
+				tx.Name = fmt.Sprintf("%s %s", req.Method, req.URL.Path)
+				apmhttp.SetHeaders(req, tx.TraceContext(), false)
+			}
 		}
 		proxy := &httputil.ReverseProxy{Director: director}
 		proxy.ServeHTTP(c.Writer, c.Request)
