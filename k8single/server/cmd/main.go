@@ -2,14 +2,15 @@ package main
 
 import (
 	"fmt"
-	"go.elastic.co/apm/module/apmhttp/v2"
 	"net/http"
 	"net/http/httputil"
 	// external packages
 	"github.com/gin-gonic/gin"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.elastic.co/apm/module/apmgin/v2"
+	"go.elastic.co/apm/module/apmhttp/v2"
 	"go.elastic.co/apm/v2"
+
+	apiv1 "ghilbut.com/k8single/api"
 )
 
 func init() {
@@ -18,27 +19,29 @@ func init() {
 	//   * https://gabrieltanner.org/blog/collecting-prometheus-metrics-in-golang/
 }
 
+// @title          K8Single API
+// @version        1.0
+// @description    Manager for Applications on Kubernetes
+
+// @contact.name   ghilbut
+// @contact.email  ghilbut@gmail.com
+
+// @license.name   MIT License
+// @license.url    https://opensource.org/license/mit/
+
+// @BasePath  /v1
+
 func main() {
-	r := gin.Default()
-	r.NoRoute(ReverseProxy())
-	r.SetTrustedProxies([]string{"localhost:3000"})
+	r := gin.New()
 
 	r.Use(
 		apmgin.Middleware(r),
 	)
 
-	r.GET("/metrics", func() gin.HandlerFunc {
-		h := promhttp.Handler()
-		return func(c *gin.Context) {
-			h.ServeHTTP(c.Writer, c.Request)
-		}
-	}())
-	r.GET("/ping", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "pong",
-		})
-	})
+	apiv1.RegHandler(r)
 
+	r.NoRoute(ReverseProxy())
+	r.SetTrustedProxies([]string{"localhost:3000"})
 	r.Run()
 }
 
