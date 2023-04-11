@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httputil"
+	"os"
+	"path/filepath"
+
 	// external packages
 	"github.com/gin-gonic/gin"
 	"go.elastic.co/apm/module/apmgin/v2"
@@ -32,6 +35,14 @@ func init() {
 // @BasePath  /v1
 
 func main() {
+
+	chdir, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
+	configPath := filepath.Join(chdir, "config.yaml")
+	fmt.Println(configPath)
+
 	r := gin.New()
 
 	r.Use(

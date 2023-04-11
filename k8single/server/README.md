@@ -1,5 +1,8 @@
 # K8Single Server
 
+* v1 - RESTful API
+* v2 - GraphQL
+
 ## Local environment
 
 ### Generate swagger document

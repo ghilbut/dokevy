@@ -1,7 +1,5 @@
 declare module '@elastic/apm-rum-react' {
     import { ComponentType } from 'react';
-    import { Route } from 'react-router';
-    export const ApmRoute: typeof Route;
 
     /**
      * Wrap a component to record an elastic APM transaction while it is rendered.
