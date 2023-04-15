@@ -6,27 +6,48 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func HandleState(ctx *gin.Context) {
-
+func addStateRoutes(g *gin.RouterGroup) {
+	const path = "/states/:name"
+	g.GET(path, HandleGetState)
+	g.POST(path, HandleUpdateState)
+	g.Handle(httpMethodLock, path, HandleLockState)
+	g.Handle(httpMethodUnlock, path, HandleUnlockState)
 }
 
-func HandleStateUpdate(ctx *gin.Context) {
-	if ctx.Request.Method != http.MethodPost {
-		ctx.AbortWithStatus(http.StatusMethodNotAllowed)
-		return
-	}
+func HandleGetState(ctx *gin.Context) {
+	v := `{
+  "version": 4,
+  "terraform_version": "1.4.2",
+  "serial": 1,
+  "lineage": "145ec231-90be-4a48-e96d-00b782f31f82",
+  "outputs": {
+    "a": {
+      "value": "a",
+      "type": "string"
+    },
+    "b": {
+      "value": "b",
+      "type": "string",
+      "sensitive": true
+    }
+  },
+  "resources": [],
+  "check_results": null
+}`
+
+	ctx.String(http.StatusOK, v)
 }
 
-func HandleStateLock(ctx *gin.Context) {
-	if ctx.Request.Method != "LOCK" {
-		ctx.AbortWithStatus(http.StatusMethodNotAllowed)
-		return
-	}
+func HandleUpdateState(ctx *gin.Context) {
+	ctx.Status(http.StatusOK)
 }
 
-func HandleStateUnlock(ctx *gin.Context) {
-	if ctx.Request.Method != "UNLOCK" {
-		ctx.AbortWithStatus(http.StatusMethodNotAllowed)
-		return
-	}
+func HandleLockState(ctx *gin.Context) {
+	//ctx.Status(http.StatusNotImplemented)
+	ctx.Status(http.StatusOK)
+}
+
+func HandleUnlockState(ctx *gin.Context) {
+	//ctx.Status(http.StatusNotImplemented)
+	ctx.Status(http.StatusOK)
 }

@@ -9,10 +9,12 @@ import (
 
 	// external packages
 	"github.com/gin-gonic/gin"
+	log "github.com/sirupsen/logrus"
 	"go.elastic.co/apm/module/apmgin/v2"
 	"go.elastic.co/apm/module/apmhttp/v2"
 	"go.elastic.co/apm/v2"
 
+	// project packages
 	apiv1 "ghilbut.com/k8single/api"
 )
 
@@ -36,6 +38,8 @@ func init() {
 
 func main() {
 
+	log.SetLevel(log.TraceLevel)
+
 	chdir, err := os.Getwd()
 	if err != nil {
 		panic(err)
@@ -49,7 +53,7 @@ func main() {
 		apmgin.Middleware(r),
 	)
 
-	apiv1.RegHandler(r)
+	apiv1.AddRoutes(r)
 
 	r.NoRoute(ReverseProxy())
 	r.SetTrustedProxies([]string{"localhost:3000"})

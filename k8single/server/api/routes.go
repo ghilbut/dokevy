@@ -8,15 +8,18 @@ import (
 	"github.com/gin-gonic/gin"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-
+	// project packages
 	apiv1 "ghilbut.com/k8single/api/v1/rest"
+	"ghilbut.com/k8single/api/v1/terraform"
 )
 
-func RegHandler(r *gin.Engine) {
+func AddRoutes(r *gin.Engine) {
 
 	v1 := r.Group("/v1")
 	{
 		v1.GET("/hello", apiv1.Helloworld)
+		t := v1.Group("/terraform")
+		terraform.AddRoutes(t)
 	}
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
