@@ -5,7 +5,10 @@ import { useSession, signIn, signOut } from "next-auth/react"
 const inter = Inter({ subsets: ['latin'] })
 
 export default function Home() {
-  const { data: session } = useSession()
+  const { data: session, status } = useSession()
+
+  console.log('SESSION STATUS: ', status);
+
   if(session) {
     return <>
       Signed in as {session.user.email} <br/>

@@ -1,0 +1,25 @@
+version: "3.9"
+networks:
+  none:
+    external: true
+    name: none
+services:
+  postgres:
+    image: postgres:15.2
+    container_name: postgres
+    environment:
+      - POSTGRES_PASSWORD=postgrespw
+    ports:
+      - 0.0.0.0:5432:5432
+    read_only: true
+    restart: always
+    tmpfs: /var/run/postgresql
+    volumes:
+      - .data/postgres:/var/lib/postgresql/data
+  memcached:
+    image: memcached:1.6.18
+    container_name: memcached
+    ports:
+      - 0.0.0.0:11211:11211
+    restart: always
+---

@@ -1,11 +1,11 @@
 package api
 
 import (
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"net/http"
 	"path"
 	// external packages
 	"github.com/gin-gonic/gin"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	// project packages
@@ -16,11 +16,10 @@ import (
 func AddRoutes(r *gin.Engine) {
 
 	v1 := r.Group("/v1")
-	{
-		v1.GET("/hello", apiv1.Helloworld)
-		t := v1.Group("/terraform")
-		terraform.AddRoutes(t)
-	}
+	v1.GET("/hello", apiv1.Helloworld)
+
+	t := v1.Group("/terraform")
+	terraform.AddRoutes(t)
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 	r.GET("/swagger", func(c *gin.Context) {

@@ -6,8 +6,8 @@ const nextConfig = {
   async rewrites() {
     return [
       {
-        source: '/v1/:path*/',
-        destination: `${process.env.API_HOST || 'http://localhost:8080'}/v1/:path*/`,
+        source: '/v1/:path*',
+        destination: `${process.env.API_HOST || 'http://localhost:8080'}/v1/:path*`,
       }
     ]
   }

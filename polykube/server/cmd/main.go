@@ -6,16 +6,17 @@ import (
 	"net/http/httputil"
 	"os"
 	"path/filepath"
-
 	// external packages
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 	"go.elastic.co/apm/module/apmgin/v2"
 	"go.elastic.co/apm/module/apmhttp/v2"
 	"go.elastic.co/apm/v2"
-
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 	// project packages
 	apiv1 "ghilbut.com/k8single/api"
+	"ghilbut.com/k8single/internal/auth"
 )
 
 func init() {
@@ -38,7 +39,16 @@ func init() {
 
 func main() {
 
+	// logrus
 	log.SetLevel(log.TraceLevel)
+
+	// gorm
+	dsn := "host=localhost user=postgres password=postgrespw dbname=postgres port=5432 sslmode=disable TimeZone=Asia/Seoul"
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	if err != nil {
+		panic(err)
+	}
+	//db.AutoMigrate()
 
 	chdir, err := os.Getwd()
 	if err != nil {
@@ -47,10 +57,16 @@ func main() {
 	configPath := filepath.Join(chdir, "config.yaml")
 	fmt.Println(configPath)
 
+	// gin-gonic
 	r := gin.New()
 
 	r.Use(
 		apmgin.Middleware(r),
+		func(ctx *gin.Context) {
+			ctx.Set("DB", db)
+			ctx.Next()
+		},
+		auth.Middleware,
 	)
 
 	apiv1.AddRoutes(r)
