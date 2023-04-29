@@ -17,11 +17,12 @@ import (
 )
 
 func addSecretRoutes(g *gin.RouterGroup) {
-	const path = "/secrets/:name"
-	g.GET(path, HandleGetSecret)
-	g.POST(path, HandleUpdateSecret)
-	g.Handle(httpMethodLock, path, HandleSecretLock)
-	g.Handle(httpMethodUnlock, path, HandleSecretUnlock)
+	g.GET("/:name", HandleGetSecret)
+	g.POST("/:name", HandleCreateSecret)
+	g.DELETE("/:name", HandleDeleteSecret)
+	g.POST("/:name/values", HandleCreateSecretValue)
+	g.PUT("/:name/values/:key", HandleUpdateSecretValue)
+	g.DELETE("/:name/values/:key", HandleDeleteSecretValue)
 }
 
 const tfmain = `
@@ -192,14 +193,22 @@ output {{.Name}} {
 	ctx.JSON(200, s)
 }
 
-func HandleUpdateSecret(ctx *gin.Context) {
+func HandleCreateSecret(ctx *gin.Context) {
 	ctx.Status(http.StatusForbidden)
 }
 
-func HandleSecretLock(ctx *gin.Context) {
+func HandleDeleteSecret(ctx *gin.Context) {
 	ctx.Status(http.StatusForbidden)
 }
 
-func HandleSecretUnlock(ctx *gin.Context) {
+func HandleCreateSecretValue(ctx *gin.Context) {
+	ctx.Status(http.StatusForbidden)
+}
+
+func HandleUpdateSecretValue(ctx *gin.Context) {
+	ctx.Status(http.StatusForbidden)
+}
+
+func HandleDeleteSecretValue(ctx *gin.Context) {
 	ctx.Status(http.StatusForbidden)
 }

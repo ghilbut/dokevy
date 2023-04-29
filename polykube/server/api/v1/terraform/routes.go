@@ -1,68 +1,69 @@
 package terraform
 
 import (
+	"crypto/sha512"
 	"errors"
+	"fmt"
+	log "github.com/sirupsen/logrus"
 	"net/http"
-	"net/http/httputil"
-
 	// external packages
 	"github.com/gin-gonic/gin"
-	log "github.com/sirupsen/logrus"
-)
-
-const (
-	httpMethodLock   = "LOCK"
-	httpMethodUnlock = "UNLOCK"
+	"gorm.io/gorm"
+	// project packages
+	"github.com/ghilbut/polykube/pkg/auth"
+	"github.com/ghilbut/polykube/pkg/terraform"
 )
 
 func AddRoutes(g *gin.RouterGroup) {
 	const (
-		userpath  = "/users/:user"
-		grouppath = "/groups/:group"
+		states_path  = "/states"
+		secrets_path = "/secrets"
 	)
-
-	users := g.Group(userpath, middleware)
-	addStateRoutes(users)
-	addSecretRoutes(users)
-
-	groups := g.Group(grouppath, middleware)
-	addStateRoutes(groups)
-	addSecretRoutes(groups)
+	states := g.Group(states_path, middleware)
+	addStateRoutes(states)
+	secrets := g.Group(secrets_path, middleware)
+	addSecretRoutes(secrets)
 }
 
 func middleware(ctx *gin.Context) {
-	w := ctx.Writer
-
-	dump, _ := httputil.DumpRequest(ctx.Request, true)
-	log.Trace(string(dump))
-
-	username, password, ok := ctx.Request.BasicAuth()
-	if !ok {
-		const (
-			k = "WWW-Authenticate"
-			v = `Basic realm="Give username and password", charset="UTF-8"`
-			m = "No basic auth present"
-		)
-		ctx.Writer.Header().Set(k, v)
-		ctx.AbortWithError(http.StatusUnauthorized, errors.New(m))
+	if !isSessionAuthenticated(ctx) {
 		return
 	}
 
-	if !isAuthorised(ctx, username, password) {
-		const (
-			k = "WWW-Authenticate"
-			v = `Basic realm="Give username and password", charset="UTF-8"`
-			m = "Invalid username or password"
-		)
-		w.Header().Set(k, v)
-		ctx.AbortWithError(http.StatusUnauthorized, errors.New(m))
+	if isBasicAuthenticated(ctx) {
 		return
 	}
 
-	ctx.Next()
+	const (
+		k = "WWW-Authenticate"
+		v = `Basic realm="Give username and password", charset="UTF-8"`
+		m = "No basic auth present"
+	)
+	ctx.Writer.Header().Set(k, v)
+	ctx.AbortWithError(http.StatusUnauthorized, errors.New(m))
 }
 
-func isAuthorised(ctx *gin.Context, username, password string) bool {
-	// TODO(ghilbut): check username and password
-	return true
+func isSessionAuthenticated(ctx *gin.Context) bool {
+	user := auth.GetUser(ctx)
+	return user != nil
+}
+
+func isBasicAuthenticated(ctx *gin.Context) bool {
+	if username, password, ok := ctx.Request.BasicAuth(); ok {
+		return isBasicAuthorised(ctx, username, password)
+	}
+	return false
+}
+
+func isBasicAuthorised(ctx *gin.Context, username, password string) bool {
+	var key string
+	query := fmt.Sprintf("SELECT password FROM %s WHERE username = ? ;", terraform.BotTableName)
+	db := ctx.MustGet("DB").(*gorm.DB)
+	if err := db.Raw(query, username).Row().Scan(&key); err != nil {
+		log.Error(err)
+		return false
+	}
+	sum := sha512.Sum512([]byte(password))
+	sha := fmt.Sprintf("%x", sum)
+	return key == sha
 }

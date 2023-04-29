@@ -6,8 +6,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+const (
+	httpMethodLock   = "LOCK"
+	httpMethodUnlock = "UNLOCK"
+)
+
 func addStateRoutes(g *gin.RouterGroup) {
-	const path = "/states/:name"
+	const path = "/:name"
 	g.GET(path, HandleGetState)
 	g.POST(path, HandleUpdateState)
 	g.Handle(httpMethodLock, path, HandleLockState)

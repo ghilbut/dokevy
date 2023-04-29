@@ -1,4 +1,0 @@
-- model: terraform_states.State
-  pk: 1
-  fields:
-    name: 01
