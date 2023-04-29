@@ -9,7 +9,7 @@
 
 ```postgresql
 CREATE TABLE IF NOT EXISTS "nextauth_users" (
-  "id" UUID,
+  "id" BIGSERIAL,
   "name" VARCHAR(255),
   "email" VARCHAR(255),
   "email_verified" TIMESTAMP WITH TIME ZONE,
@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS "nextauth_users" (
 );
 
 CREATE TABLE IF NOT EXISTS "nextauth_accounts" (
-  "id" UUID,
+  "id" BIGSERIAL,
   "type" VARCHAR(255) NOT NULL,
   "provider" VARCHAR(255) NOT NULL,
   "provider_account_id" VARCHAR(255) NOT NULL,
@@ -30,27 +30,29 @@ CREATE TABLE IF NOT EXISTS "nextauth_accounts" (
   "scope" VARCHAR(255),
   "id_token" TEXT,
   "session_state" VARCHAR(255),
-  "user_id" UUID REFERENCES "nextauth_users" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+  "user_id" BIGSERIAL REFERENCES "nextauth_users" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
   PRIMARY KEY ("id")
 );
 
 CREATE INDEX IF NOT EXISTS nextauth_accounts_provider_index ON nextauth_accounts (provider, provider_account_id);
 
 CREATE TABLE IF NOT EXISTS "nextauth_sessions" (
-  "id" UUID,
+  "id" BIGSERIAL,
   "expires" TIMESTAMP WITH TIME ZONE NOT NULL,
   "session_token" VARCHAR(255) NOT NULL,
-  "user_id" UUID REFERENCES "nextauth_users" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+  "user_id" BIGSERIAL REFERENCES "nextauth_users" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
   UNIQUE ("session_token"),
   PRIMARY KEY ("id")
 );
 
-CREATE TABLE IF NOT EXISTS "nextauth_verification_token" (
+CREATE TABLE IF NOT EXISTS "nextauth_verification_tokens" (
   "identifier" VARCHAR(255) NOT NULL,
   "expires" TIMESTAMP WITH TIME ZONE NOT NULL,
   "token" VARCHAR(255) NOT NULL ,
   PRIMARY KEY ("token")
 );
+
+CREATE INDEX IF NOT EXISTS nextauth_verification_token_index ON nextauth_verification_tokens (identifier, token);
 ```
 
 ## Teraform
