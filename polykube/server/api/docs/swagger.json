@@ -2,41 +2,17 @@
     "swagger": "2.0",
     "info": {
         "description": "Manager for Applications on Kubernetes",
-        "title": "K8Single API",
+        "title": "PolyKube API",
         "contact": {
             "name": "ghilbut",
             "email": "ghilbut@gmail.com"
         },
         "license": {
-            "name": "MIT License",
-            "url": "https://opensource.org/license/mit/"
+            "name": "The GNU General Public License v3.0 (GPL v3)",
+            "url": "https://opensource.org/license/gpl-3-0/"
         },
         "version": "1.0"
     },
-    "basePath": "/v1",
-    "paths": {
-        "/hello": {
-            "get": {
-                "description": "do ping",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "example"
-                ],
-                "summary": "ping example",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        }
-    }
+    "basePath": "/",
+    "paths": {}
 }

@@ -1,47 +1,45 @@
 package api
 
 import (
-	swaggerfiles "github.com/swaggo/files"
-	ginSwagger "github.com/swaggo/gin-swagger"
 	"net/http"
 	"path"
 
 	// external packages
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	swaggerfiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+
 	// project packages
-	apiv1 "github.com/ghilbut/polykube/api/v1/rest"
+	_ "github.com/ghilbut/polykube/api/docs"
 	"github.com/ghilbut/polykube/api/v1/terraform"
 )
 
 func AddRoutes(r *gin.Engine) {
+	r.GET("/metrics", getMetricsHandler())
+	r.GET("/healthz", healthCheckHandlerFunc)
+	r.GET("/swagger/*any", swaggerHandlerFunc)
+	r.GET("/swagger", swaggerRedirectHandlerFunc)
 
 	v1 := r.Group("/v1")
-	v1.GET("/hello", apiv1.Helloworld)
-
 	t := v1.Group("/terraform")
 	terraform.AddRoutes(t)
-
-	r.GET("/metrics", GetMetricsHandler())
-	r.GET("/ping", GetTestHandler())
-
-	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
-	r.GET("/swagger", func(c *gin.Context) {
-		c.Redirect(http.StatusFound, path.Join(c.Request.RequestURI, "index.html"))
-	})
 }
 
-func GetMetricsHandler() gin.HandlerFunc {
+func getMetricsHandler() gin.HandlerFunc {
 	h := promhttp.Handler()
-	return func(c *gin.Context) {
-		h.ServeHTTP(c.Writer, c.Request)
+	return func(ctx *gin.Context) {
+		h.ServeHTTP(ctx.Writer, ctx.Request)
 	}
 }
 
-func GetTestHandler() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "pong",
-		})
-	}
+var healthCheckHandlerFunc gin.HandlerFunc = func(ctx *gin.Context) {
+	ctx.String(http.StatusOK, "OK")
+}
+
+var swaggerHandlerFunc gin.HandlerFunc = ginSwagger.WrapHandler(swaggerfiles.Handler)
+
+var swaggerRedirectHandlerFunc gin.HandlerFunc = func(ctx *gin.Context) {
+	location := path.Join(ctx.Request.RequestURI, "index.html")
+	ctx.Redirect(http.StatusFound, location)
 }

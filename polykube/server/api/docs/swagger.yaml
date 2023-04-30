@@ -1,28 +1,13 @@
-basePath: /v1
+basePath: /
 info:
   contact:
     email: ghilbut@gmail.com
     name: ghilbut
   description: Manager for Applications on Kubernetes
   license:
-    name: MIT License
-    url: https://opensource.org/license/mit/
-  title: K8Single API
+    name: The GNU General Public License v3.0 (GPL v3)
+    url: https://opensource.org/license/gpl-3-0/
+  title: PolyKube API
   version: "1.0"
-paths:
-  /hello:
-    get:
-      consumes:
-      - application/json
-      description: do ping
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: string
-      summary: ping example
-      tags:
-      - example
+paths: {}
 swagger: "2.0"

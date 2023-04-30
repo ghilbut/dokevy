@@ -1,4 +1,7 @@
+## https://github.com/dexidp/dex/blob/master/config.yaml.dist
+
 issuer: http://localhost:5556
+
 storage:
   type: postgres
   config:
@@ -9,24 +12,31 @@ storage:
     database: dex
     ssl:
       mode: disable
+
 web:
   http: 0.0.0.0:5556
-# frontend:
-#   issuer: dex
-#   logoURL: theme/logo.png
-#   dir: web/
-#   theme: light
+grpc:
+  addr: 0.0.0.0:5557
+  # tlsCert: server.crt
+  # tlsKey: server.key
+  # tlsClientCA: ca.crt
 telemetry:
   http: 0.0.0.0:5558
   enableProfiling: true
+
+logger:
+  level: debug
+  format: text
+
 oauth2:
   responseTypes:
     - code
     - token
     - id_token
   skipApprovalScreen: true
+
 staticClients:
-  - name:   NextAuth.js on localhost
+  - name:   NextAuth.js
     id:     nextauthjs
     secret: nextauthjs
     redirectURIs:
@@ -44,5 +54,6 @@ connectors:
       redirectURI:  http://localhost:5556/callback
       # hostedDomains:
       #   - ghilbut.com
+
 enablePasswordDB: false
 ---
