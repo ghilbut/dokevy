@@ -24,6 +24,21 @@ services:
     volumes:
       - .data/postgres:/var/lib/postgresql/data
   dex:
+    depends_on:
+      - postgres
+    container_name: dex
+    image: dexidp/dex:v2.36.0
+    read_only: true
+    restart: always
+    ports:
+      - 0.0.0.0:5556:5556
+      - 0.0.0.0:5558:5558
+    tmpfs: /tmp
+    volumes:
+      - ./conf/dex:/etc/dex:ro
+    environment:
+      - GOOGLE_OAUTH2_CLIENT_ID
+      - GOOGLE_OAUTH2_CLIENT_SECRET
 
   # vault:
   #   image: hashicorp/vault:1.13.2

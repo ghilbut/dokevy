@@ -1,0 +1,48 @@
+issuer: http://localhost:5556
+storage:
+  type: postgres
+  config:
+    host: postgres
+    port: 5432
+    user: postgres
+    password: postgrespw
+    database: dex
+    ssl:
+      mode: disable
+web:
+  http: 0.0.0.0:5556
+# frontend:
+#   issuer: dex
+#   logoURL: theme/logo.png
+#   dir: web/
+#   theme: light
+telemetry:
+  http: 0.0.0.0:5558
+  enableProfiling: true
+oauth2:
+  responseTypes:
+    - code
+    - token
+    - id_token
+  skipApprovalScreen: true
+staticClients:
+  - name:   NextAuth.js on localhost
+    id:     nextauthjs
+    secret: nextauthjs
+    redirectURIs:
+      - http://localhost:3000/api/auth/callback/dex
+      - http://127.0.0.1:3000/api/auth/callback/dex
+
+connectors:
+  ## https://dexidp.io/docs/connectors/google/
+  - name: Google
+    type: google
+    id:   google
+    config:
+      clientID:     $GOOGLE_OAUTH2_CLIENT_ID
+      clientSecret: $GOOGLE_OAUTH2_CLIENT_SECRET
+      redirectURI:  http://localhost:5556/callback
+      # hostedDomains:
+      #   - ghilbut.com
+enablePasswordDB: false
+---
