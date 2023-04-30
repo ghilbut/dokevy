@@ -10,7 +10,6 @@ import (
 	// external packages
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
-	"go.elastic.co/apm/module/apmgin/v2"
 	"go.elastic.co/apm/module/apmhttp/v2"
 	"go.elastic.co/apm/v2"
 	"gorm.io/driver/postgres"
@@ -18,7 +17,6 @@ import (
 
 	// project packages
 	"github.com/ghilbut/polykube/api"
-	"github.com/ghilbut/polykube/pkg/auth"
 )
 
 func init() {
@@ -30,14 +28,18 @@ func init() {
 // @title          PolyKube API
 // @version        1.0
 // @description    Manager for Applications on Kubernetes
-
+//
 // @contact.name   ghilbut
 // @contact.email  ghilbut@gmail.com
-
+//
 // @license.name   The GNU General Public License v3.0
-// @license.url    https://opensource.org/license/gpl-3-0/
-
+// @license.url    https://www.gnu.org/licenses/gpl-3.0.en.html
+//
 // @BasePath       /
+//
+// @securityDefinitions.apikey ApiKey "sentence with space"
+// @in header
+// @name Authorization
 
 func main() {
 
@@ -63,20 +65,20 @@ func main() {
 	r := gin.New()
 
 	r.Use(
-		apmgin.Middleware(r),
+		//apmgin.Middleware(r),
 		func(ctx *gin.Context) {
 			ctx.Set("DB", db)
 			ctx.Next()
 		},
-		auth.Middleware,
+		//auth.Middleware,
 	)
 
 	api.AddRoutes(r)
 
-	r.NoRoute(ReverseProxy())
-	r.SetTrustedProxies([]string{
-		"localhost:3000",
-	})
+	// r.NoRoute(ReverseProxy())
+	// r.SetTrustedProxies([]string{
+	// 	"localhost:3000",
+	// })
 	r.Run()
 }
 

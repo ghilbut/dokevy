@@ -11,11 +11,11 @@ import (
 
 func AddRoutes(g *gin.RouterGroup) {
 	g.Use(middleware)
-	g.Handle(http.MethodGet, "/clients", ListClients)
-	g.Handle(http.MethodPost, "/clients", CreateClient)
-	g.Handle(http.MethodGet, "/clients/:id", GetClient)
-	g.Handle(http.MethodPut, "/clients/:id", UpdateClient)
-	g.Handle(http.MethodDelete, "/clients/:id", DeleteClient)
+	g.GET("/clients", ListClients)
+	g.POST("/clients", CreateClient)
+	g.GET("/clients/:id", GetClient)
+	g.PUT("/clients/:id", UpdateClient)
+	g.DELETE("/clients/:id", DeleteClient)
 }
 
 func middleware(ctx *gin.Context) {

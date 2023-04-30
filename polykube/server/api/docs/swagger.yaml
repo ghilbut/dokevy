@@ -1,13 +1,189 @@
 basePath: /
+definitions:
+  dex.Client:
+    properties:
+      clientId:
+        type: string
+      clientSecret:
+        type: string
+      redirectURIs:
+        items:
+          type: string
+        type: array
+    type: object
 info:
   contact:
     email: ghilbut@gmail.com
     name: ghilbut
   description: Manager for Applications on Kubernetes
   license:
-    name: The GNU General Public License v3.0 (GPL v3)
-    url: https://opensource.org/license/gpl-3-0/
+    name: The GNU General Public License v3.0
+    url: https://www.gnu.org/licenses/gpl-3.0.en.html
   title: PolyKube API
   version: "1.0"
-paths: {}
+paths:
+  /healthz:
+    get:
+      description: health check for process controller and load balancer
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: path
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Health check
+      tags:
+      - system
+  /metrics:
+    get:
+      description: get metrics for prometheus exporter
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Prometheus metrics
+      tags:
+      - system
+  /v1/dex/clients:
+    get:
+      consumes:
+      - application/json
+      description: get dex's OIDC client list
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - ApiKey: []
+      summary: List Dex clients
+      tags:
+      - dex
+    post:
+      consumes:
+      - application/json
+      description: create dex's new OIDC client
+      parameters:
+      - description: New Client
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/dex.Client'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Create Dex client
+      tags:
+      - dex
+  /v1/dex/clients/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: delete dex's specific OIDC client
+      parameters:
+      - description: Client ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Delete Dex client
+      tags:
+      - dex
+    get:
+      consumes:
+      - application/json
+      description: get dex's specific OIDC client
+      parameters:
+      - description: Client ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Get Dex client
+      tags:
+      - dex
+    put:
+      consumes:
+      - application/json
+      description: update dex's specific OIDC client
+      parameters:
+      - description: Client ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Updated Client Data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/dex.Client'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Update Dex client
+      tags:
+      - dex
+securityDefinitions:
+  ApiKey "sentence with space":
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"
