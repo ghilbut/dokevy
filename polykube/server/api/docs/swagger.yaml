@@ -11,6 +11,15 @@ definitions:
           type: string
         type: array
     type: object
+  dex.ClientList:
+    properties:
+      clients:
+        items:
+          $ref: '#/definitions/dex.Client'
+        type: array
+      total:
+        type: integer
+    type: object
 info:
   contact:
     email: ghilbut@gmail.com
@@ -58,16 +67,23 @@ paths:
       - system
   /v1/dex/clients:
     get:
-      consumes:
-      - application/json
       description: get dex's OIDC client list
+      parameters:
+      - description: Last cursor position
+        in: query
+        name: after
+        type: string
+      - description: Max returned item size
+        in: query
+        name: size
+        type: integer
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            type: string
+            $ref: '#/definitions/dex.ClientList'
         "500":
           description: Internal Server Error
           schema:

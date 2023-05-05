@@ -2,6 +2,7 @@ package api
 
 import (
 	"github.com/ghilbut/polykube/api/v1/dex"
+	"github.com/ghilbut/polykube/pkg/auth"
 	"net/http"
 	"path"
 
@@ -22,20 +23,23 @@ func AddRoutes(r *gin.Engine) {
 	r.GET("/swagger/*any", swaggerHandlerFunc)
 	r.GET("/swagger", swaggerRedirectHandlerFunc)
 
-	v1 := r.Group("/v1")
-	// Dex IDP
-	v1.GET("/dex/clients", dex.ListClients)
-	v1.POST("/dex/clients", dex.CreateClient)
-	v1.GET("/dex/clients/:id", dex.GetClient)
-	v1.PUT("/dex/clients/:id", dex.UpdateClient)
-	v1.DELETE("/dex/clients/:id", dex.DeleteClient)
-	// Terraform secrets
-	v1.GET("/terraform/secrets/:name", terraform.HandleGetSecret)
-	v1.POST("/terraform/secrets/:name", terraform.HandleCreateSecret)
-	v1.DELETE("/terraform/secrets/:name", terraform.HandleDeleteSecret)
-	v1.POST("/terraform/secrets/:name/values", terraform.HandleCreateSecretValue)
-	v1.PUT("/terraform/secrets/:name/values/:key", terraform.HandleUpdateSecretValue)
-	v1.DELETE("/terraform/secrets/:name/values/:key", terraform.HandleDeleteSecretValue)
+	// API v1 Group
+	v1 := r.Group("/v1", auth.Middleware)
+	// Dex IDP handlers
+	v1dex := v1.Group("/dex", dex.Middleware())
+	v1dex.GET("/clients", dex.ListClients)
+	v1dex.POST("/clients", dex.CreateClient)
+	v1dex.GET("/clients/:id", dex.GetClient)
+	v1dex.PUT("/clients/:id", dex.UpdateClient)
+	v1dex.DELETE("/clients/:id", dex.DeleteClient)
+	// Terraform secrets handlers
+	v1terraform := v1.Group("/terraform")
+	v1terraform.GET("/secrets/:name", terraform.HandleGetSecret)
+	v1terraform.POST("/secrets/:name", terraform.HandleCreateSecret)
+	v1terraform.DELETE("/secrets/:name", terraform.HandleDeleteSecret)
+	v1terraform.POST("/secrets/:name/values", terraform.HandleCreateSecretValue)
+	v1terraform.PUT("/secrets/:name/values/:key", terraform.HandleUpdateSecretValue)
+	v1terraform.DELETE("/secrets/:name/values/:key", terraform.HandleDeleteSecretValue)
 }
 
 // GetMetrics godoc

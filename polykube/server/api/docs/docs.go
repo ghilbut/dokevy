@@ -83,9 +83,6 @@ const docTemplate = `{
                     }
                 ],
                 "description": "get dex's OIDC client list",
-                "consumes": [
-                    "application/json"
-                ],
                 "produces": [
                     "application/json"
                 ],
@@ -93,11 +90,25 @@ const docTemplate = `{
                     "dex"
                 ],
                 "summary": "List Dex clients",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Last cursor position",
+                        "name": "after",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Max returned item size",
+                        "name": "size",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/dex.ClientList"
                         }
                     },
                     "500": {
@@ -282,6 +293,20 @@ const docTemplate = `{
                     "items": {
                         "type": "string"
                     }
+                }
+            }
+        },
+        "dex.ClientList": {
+            "type": "object",
+            "properties": {
+                "clients": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dex.Client"
+                    }
+                },
+                "total": {
+                    "type": "integer"
                 }
             }
         }
