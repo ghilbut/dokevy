@@ -9,7 +9,7 @@ const SessionTableName: string           = 'nextauth_sessions';
 const UserTableName: string              = 'nextauth_users';
 const VerificationTokenTableName: string = 'nextauth_verification_tokens';
 
-export default function Adapter(client, options = {}): DefaultAdapter {
+export default function Adapter(): DefaultAdapter {
 
     // https://node-postgres.com/features/connecting#environment-variables
     // https://node-postgres.com/apis/client
