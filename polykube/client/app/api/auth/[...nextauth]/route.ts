@@ -1,6 +1,6 @@
 import NextAuth from 'next-auth';
 import type { NextAuthOptions } from 'next-auth';
-import Adapter from '@/ext/next-auth/adapter';
+import Adapter from '@/lib/ext/next-auth/adapter';
 
 export const authOptions: NextAuthOptions = {
     providers: [

@@ -6,7 +6,7 @@ import {
   LogoutButton,
   ProfileButton,
   RegisterButton,
-} from '@/components/buttons.component';
+} from '@/lib/components/buttons.component';
 
 export default async function Home() {
   const session = await getServerSession(authOptions);
