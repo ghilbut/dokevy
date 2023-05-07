@@ -40,6 +40,10 @@ func AddRoutes(r *gin.Engine) {
 	v1terraform.POST("/secrets/:name/values", terraform.HandleCreateSecretValue)
 	v1terraform.PUT("/secrets/:name/values/:key", terraform.HandleUpdateSecretValue)
 	v1terraform.DELETE("/secrets/:name/values/:key", terraform.HandleDeleteSecretValue)
+	v1terraform.GET("/values", terraform.ListValues)
+	v1terraform.POST("/values/:name", terraform.CreateValues)
+	v1terraform.PUT("/values/:name", terraform.UpdateValues)
+	v1terraform.DELETE("/values/:name", terraform.DeleteValues)
 }
 
 // GetMetrics godoc
@@ -62,8 +66,8 @@ func getMetricsHandler() gin.HandlerFunc {
 // @Description  health check for process controller and load balancer
 // @Tags         system
 // @Produce      plain
-// @Success      200  {path}  string
-// @Failure      500  {object}  string
+// @Success      200  {string}  string  "OK"
+// @Failure      500  {string}  string
 // @Router       /healthz [get]
 func getHealthCheckHandler() gin.HandlerFunc {
 	return func(ctx *gin.Context) {

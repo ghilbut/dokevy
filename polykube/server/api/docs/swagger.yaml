@@ -2,14 +2,16 @@ basePath: /
 definitions:
   dex.Client:
     properties:
-      clientId:
+      id:
         type: string
-      clientSecret:
+      name:
         type: string
-      redirectURIs:
+      redirect_uris:
         items:
           type: string
         type: array
+      secret:
+        type: string
     type: object
   dex.ClientList:
     properties:
@@ -19,6 +21,26 @@ definitions:
         type: array
       total:
         type: integer
+    type: object
+  dex.createReq:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      redirectURIs:
+        items:
+          type: string
+        type: array
+    type: object
+  dex.updateReq:
+    properties:
+      name:
+        type: string
+      redirectURIs:
+        items:
+          type: string
+        type: array
     type: object
 info:
   contact:
@@ -40,7 +62,7 @@ paths:
         "200":
           description: OK
           schema:
-            type: path
+            type: string
         "500":
           description: Internal Server Error
           schema:
@@ -84,6 +106,10 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/dex.ClientList'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
         "500":
           description: Internal Server Error
           schema:
@@ -103,7 +129,7 @@ paths:
         name: data
         required: true
         schema:
-          $ref: '#/definitions/dex.Client'
+          $ref: '#/definitions/dex.createReq'
       produces:
       - application/json
       responses:
@@ -136,6 +162,10 @@ paths:
           description: OK
           schema:
             type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
         "500":
           description: Internal Server Error
           schema:
@@ -159,7 +189,7 @@ paths:
         "200":
           description: OK
           schema:
-            type: string
+            $ref: '#/definitions/dex.Client'
         "500":
           description: Internal Server Error
           schema:
@@ -177,17 +207,25 @@ paths:
         name: id
         required: true
         type: string
-      - description: Updated Client Data
+      - description: Client Data to update
         in: body
         name: data
         required: true
         schema:
-          $ref: '#/definitions/dex.Client'
+          $ref: '#/definitions/dex.updateReq'
       produces:
       - application/json
       responses:
         "200":
           description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
           schema:
             type: string
         "500":

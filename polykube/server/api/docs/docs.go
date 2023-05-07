@@ -37,7 +37,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "path"
+                            "type": "string"
                         }
                     },
                     "500": {
@@ -111,6 +111,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/dex.ClientList"
                         }
                     },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -138,7 +144,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dex.Client"
+                            "$ref": "#/definitions/dex.createReq"
                         }
                     }
                 ],
@@ -184,7 +190,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/dex.Client"
                         }
                     },
                     "500": {
@@ -216,18 +222,30 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "description": "Updated Client Data",
+                        "description": "Client Data to update",
                         "name": "data",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dex.Client"
+                            "$ref": "#/definitions/dex.updateReq"
                         }
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
                         "schema": {
                             "type": "string"
                         }
@@ -268,6 +286,12 @@ const docTemplate = `{
                             "type": "string"
                         }
                     },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -282,17 +306,20 @@ const docTemplate = `{
         "dex.Client": {
             "type": "object",
             "properties": {
-                "clientId": {
+                "id": {
                     "type": "string"
                 },
-                "clientSecret": {
+                "name": {
                     "type": "string"
                 },
-                "redirectURIs": {
+                "redirect_uris": {
                     "type": "array",
                     "items": {
                         "type": "string"
                     }
+                },
+                "secret": {
+                    "type": "string"
                 }
             }
         },
@@ -307,6 +334,37 @@ const docTemplate = `{
                 },
                 "total": {
                     "type": "integer"
+                }
+            }
+        },
+        "dex.createReq": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "redirectURIs": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "dex.updateReq": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "redirectURIs": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 }
             }
         }

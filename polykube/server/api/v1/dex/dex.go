@@ -1,10 +1,9 @@
 package dex
 
 import (
-	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
+
 	// external packages
 	"github.com/dexidp/dex/api/v2"
 	"google.golang.org/grpc"
@@ -15,10 +14,10 @@ import (
 
 type Conn struct {
 	DB  *gorm.DB
-	Dex api.DexClient
+	API api.DexClient
 }
 
-func NewConn() (*Conn, error) {
+func newConn() (*Conn, error) {
 	host := "localhost"
 	port := 5432
 	user := "postgres"
@@ -38,7 +37,7 @@ func NewConn() (*Conn, error) {
 	}
 	return &Conn{
 		DB:  db,
-		Dex: api.NewDexClient(conn),
+		API: api.NewDexClient(conn),
 	}, nil
 }
 
@@ -52,7 +51,7 @@ func (conn *Conn) List(after string, size uint16) ([]Client, uint32) {
 	const sql = `SELECT
         (SELECT COUNT(*) FROM client) AS total,
         (SELECT json_agg(client.*) FROM
-          (SELECT id, secret, redirect_uris FROM client WHERE id > ? ORDER BY id LIMIT ?) AS client
+          (SELECT name, id, secret, redirect_uris FROM client WHERE id > ? ORDER BY id LIMIT ?) AS client
         ) AS rows;`
 	tx := conn.DB.Raw(sql, after, size).Scan(&result)
 	if tx.Error != nil {
@@ -68,41 +67,4 @@ func (conn *Conn) List(after string, size uint16) ([]Client, uint32) {
 	}
 
 	return items, result.Total
-}
-
-func (conn *Conn) Create(ctx context.Context, client *Client) (*Client, error) {
-	req := &api.CreateClientReq{
-		Client: &api.Client{
-			Id:           client.ID,
-			Secret:       client.Secret,
-			RedirectUris: client.RedirectURIs,
-		},
-	}
-	res, err := conn.Dex.CreateClient(ctx, req)
-	if err != nil {
-		panic(err)
-	}
-
-	c := res.GetClient()
-	if res.AlreadyExists {
-		const f = "Client ID (%s) is already exists"
-		t := fmt.Sprintf(f, client.ID)
-		return nil, errors.New(t)
-	}
-
-	return &Client{
-		ID:           c.Id,
-		Secret:       c.Secret,
-		RedirectURIs: c.RedirectUris,
-	}, nil
-}
-
-func (conn *Conn) Get() {
-}
-
-func (conn *Conn) Update() {
-}
-
-func (conn *Conn) Delete() {
-
 }

@@ -2,7 +2,6 @@ package dex
 
 import (
 	"errors"
-	"github.com/ghilbut/polykube/pkg/dex"
 	"net/http"
 
 	// external packages
@@ -12,23 +11,16 @@ import (
 	"github.com/ghilbut/polykube/pkg/auth"
 )
 
-func AddRoutes(g *gin.RouterGroup) {
-	g.Use(Middleware())
-	g.GET("/clients", ListClients)
-	g.POST("/clients", CreateClient)
-	g.GET("/clients/:id", GetClient)
-	g.PUT("/clients/:id", UpdateClient)
-	g.DELETE("/clients/:id", DeleteClient)
-}
+const dexContextKey = "DEX"
 
 func Middleware() gin.HandlerFunc {
-	client, err := dex.NewConn()
+	conn, err := newConn()
 	if err != nil {
 		panic(err)
 	}
 
 	return func(ctx *gin.Context) {
-		ctx.Set("DEX", client)
+		setDexConnectionToContext(ctx, conn)
 
 		if !isSessionAuthenticated(ctx) {
 			return
@@ -42,6 +34,15 @@ func Middleware() gin.HandlerFunc {
 		ctx.Writer.Header().Set(k, v)
 		ctx.AbortWithError(http.StatusUnauthorized, errors.New(m))
 	}
+}
+
+func setDexConnectionToContext(ctx *gin.Context, conn *Conn) {
+	ctx.Set(dexContextKey, conn)
+}
+
+func getDexConnectionFromContext(ctx *gin.Context) *Conn {
+	v := ctx.MustGet("DEX")
+	return v.(*Conn)
 }
 
 func isSessionAuthenticated(ctx *gin.Context) bool {

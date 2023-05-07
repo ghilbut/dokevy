@@ -14,3 +14,14 @@ type AuditEntity struct {
 	ClientID string `gorm:"column:client_id"`
 	Message  string `gorm:"column:message"`
 }
+
+type ClientEntity struct {
+	Name         string `gorm:"column:name"`
+	ID           string `gorm:"column:id"`
+	Secret       string `gorm:"column:secret"`
+	RedirectURIs string `gorm:"column:redirect_uris"`
+}
+
+func (ClientEntity) TableName() string {
+	return "client"
+}

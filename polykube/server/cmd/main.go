@@ -65,6 +65,7 @@ func main() {
 	r := gin.New()
 
 	r.Use(
+		gin.Recovery(),
 		//apmgin.Middleware(r),
 		func(ctx *gin.Context) {
 			ctx.Set("DB", db)
