@@ -68,6 +68,14 @@ func handle(db *gorm.DB, webhookSecretKey string) fasthttp.RequestHandler {
 			return
 		}
 
+		defer func() {
+			if r := recover(); r != nil {
+				ctx.SetStatusCode(fasthttp.StatusInternalServerError)
+				ctx.SetContentType("text/html; charset=utf-8")
+				ctx.SetBody([]byte("Internal Server Error"))
+			}
+		}()
+
 		const forServer = false
 		var r http.Request
 		if err := fasthttpadaptor.ConvertRequest(ctx, &r, forServer); err != nil {
@@ -127,7 +135,7 @@ func process(event interface{}) {
 }
 
 func save(db *gorm.DB, repo, eventType, payload string) {
-	tx := db.Select("Repository", "Payload", "RequestedAt", "Status").Create(&entity{
+	tx := db.Select("Repository", "EventType", "Payload", "RequestedAt", "Status").Create(&entity{
 		Repository:  repo,
 		EventType:   eventType,
 		Payload:     payload,
