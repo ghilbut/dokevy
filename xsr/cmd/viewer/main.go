@@ -4,15 +4,17 @@ import (
 	// external
 	log "github.com/sirupsen/logrus"
 	"github.com/valyala/fasthttp"
-
 	// project
 	. "github.com/ultary/oss/xsr/internal/viewer/config"
 	. "github.com/ultary/oss/xsr/internal/viewer/storage"
+	"github.com/ultary/oss/xsr/utils"
 )
 
 func main() {
 	cfg := NewConfig()
 	log.SetLevel(cfg.LogLevel)
+
+	utils.ShowGolangEnvs()
 
 	storage := NewStorage(cfg)
 

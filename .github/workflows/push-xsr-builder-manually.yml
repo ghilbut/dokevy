@@ -1,0 +1,61 @@
+name: Push xsr-builder manually
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'user defined tag'
+        required: true
+        default: 'v0.0.1'
+        type: string
+      latest:
+        description: 'with additional latest tag'
+        default: false
+        type: boolean
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      TAG:    ${{ github.event.inputs.tag }}
+      LATEST: ${{ github.event.inputs.latest }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ env.BRANCH_REF }}
+
+      - name: Setup QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Setup docker buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login docker-hub
+        uses: docker/login-action@v2
+        with:
+          username: ghilbut
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Make docker tags
+        id: tags
+        run: |
+          echo "TAG_VERSION=-t $IMAGE:$TAG" >> $GITHUB_ENV
+          if [ $LATEST = "true" ]
+          then
+            echo "TAG_LATEST=-t $IMAGE:latest" >> $GITHUB_ENV
+          fi
+        env:
+          IMAGE:  "ghilbut/xsr-builder"
+          TAG:    ${{ env.TAG }}
+          LATEST: ${{ env.LATEST }}
+
+      - name: Build and Push
+        run: docker buildx build
+                    --platform linux/amd64,linux/arm64
+                    --target release
+                    --push
+                    -f ./xsr/.docker/Dockerfile.builder
+                    ${{ env.TAG_VERSION }}
+                    ${{ env.TAG_LATEST }} ./xsr
