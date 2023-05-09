@@ -124,7 +124,7 @@ func process(event interface{}) {
 }
 
 func save(db *gorm.DB, repo, payload string) {
-	tx := db.Create(&entity{
+	tx := db.Select("Repository", "Payload", "RequestedAt").Create(&entity{
 		Repository:  repo,
 		Payload:     payload,
 		RequestedAt: time.Now(),
