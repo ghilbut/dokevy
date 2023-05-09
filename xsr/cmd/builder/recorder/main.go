@@ -80,7 +80,9 @@ func handle(db *gorm.DB, webhookSecretKey string) fasthttp.RequestHandler {
 		if err != nil {
 			log.Fatal(err)
 		}
-		event, err := github.ParseWebHook(github.WebHookType(&r), payload)
+
+		eventType := github.WebHookType(&r)
+		event, err := github.ParseWebHook(eventType, payload)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -90,31 +92,32 @@ func handle(db *gorm.DB, webhookSecretKey string) fasthttp.RequestHandler {
 		case *github.CreateEvent:
 			e := (*github.CreateEvent)(event)
 			log.Tracef("%-18s : %s \n\t%s \n\t%s", "CreateEvent", e.GetRepo().GetFullName(), e.GetRefType(), e.GetRef())
-			save(db, e.Repo.GetFullName(), string(payload))
+			save(db, eventType, e.Repo.GetFullName(), string(payload))
 			process(event)
 
 		// Branch or tag deletion
 		case *github.DeleteEvent:
 			e := (*github.DeleteEvent)(event)
 			log.Tracef("%-18s : %s \n\t%s \n\t%s", "DeleteEvent", e.GetRepo().GetFullName(), e.GetRefType(), e.GetRef())
-			save(db, e.Repo.GetFullName(), string(payload))
+			save(db, eventType, e.Repo.GetFullName(), string(payload))
 			process(event)
 
 		// Pull requests
 		case *github.PullRequestEvent:
 			e := (*github.PullRequestEvent)(event)
 			log.Tracef("%-18s : %s \n\t[%d] %s", "PullRequestEvent", e.GetRepo().GetFullName(), e.GetNumber(), e.GetAction())
-			save(db, e.Repo.GetFullName(), string(payload))
+			save(db, eventType, e.Repo.GetFullName(), string(payload))
 			process(event)
 
 		// Pushes
 		case *github.PushEvent:
 			e := (*github.PushEvent)(event)
 			log.Tracef("%-18s : %s \n\t%s \n\t%s", "Push", e.GetRepo().GetFullName(), e.GetRef(), e.GetAction())
-			save(db, e.Repo.GetFullName(), string(payload))
+			save(db, eventType, e.Repo.GetFullName(), string(payload))
 			process(event)
 
 		default:
+			log.Infof("Ignore '%s' event type", eventType)
 		}
 	}
 }
@@ -123,24 +126,37 @@ func process(event interface{}) {
 
 }
 
-func save(db *gorm.DB, repo, payload string) {
-	tx := db.Select("Repository", "Payload", "RequestedAt").Create(&entity{
+func save(db *gorm.DB, repo, eventType, payload string) {
+	tx := db.Select("Repository", "Payload", "RequestedAt", "Status").Create(&entity{
 		Repository:  repo,
+		EventType:   eventType,
 		Payload:     payload,
 		RequestedAt: time.Now(),
+		Status:      StatusRequested,
 	})
 	if tx.Error != nil {
 		log.Fatal(tx.Error)
 	}
 }
 
+type Status string
+
+const (
+	StatusRequested  Status = "requested"
+	StatusProcessing Status = "processing"
+	StatusSucceed    Status = "succeed"
+	StatusFailed     Status = "failed"
+)
+
 type entity struct {
 	ID          int64      `gorm:"column:id"`
 	Repository  string     `gorm:"column:repository"`
+	EventType   string     `gorm:"column:type"`
 	Payload     string     `gorm:"column:payload"`
 	RequestedAt time.Time  `gorm:"column:requested"`
 	ProcessedAt *time.Time `gorm:"column:processed"`
 	CompletedAt *time.Time `gorm:"column:completed"`
+	Status      Status     `gorm:"column:status"`
 }
 
 func (entity) TableName() string {
