@@ -11,6 +11,7 @@ RUN CGO_ENABLED=0 go build -o builder ./cmd/builder
 FROM --platform=$BUILDPLATFORM scratch as release
 LABEL co.ultary.image.authors="ghilbut@gmail.com"
 
+ENV GOMAXPROCS=1
 EXPOSE 8080
 COPY --from=builder /app/builder /usr/local/bin/
 
