@@ -56,6 +56,13 @@ func main() {
 // handle returns a fasthttp request handler
 func handle(db *gorm.DB, webhookSecretKey string) fasthttp.RequestHandler {
 	return func(ctx *fasthttp.RequestCtx) {
+		path := ctx.Path()
+		if string(path) == "/healthz" {
+			ctx.SetStatusCode(fasthttp.StatusOK)
+			ctx.SetBody([]byte("OK"))
+			return
+		}
+
 		if !ctx.IsPost() {
 			ctx.SetStatusCode(fasthttp.StatusMethodNotAllowed)
 			return
