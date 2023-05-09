@@ -47,7 +47,7 @@ func main() {
 	}
 
 	// fasthttp
-	log.Info("RUN")
+	log.Info("RUN XSR Recorder on 0.0.0.0:8080")
 	if err := fasthttp.ListenAndServe("0.0.0.0:8080", handle(db, webhookSecretKey)); err != nil {
 		log.Fatal(err)
 	}
@@ -89,29 +89,29 @@ func handle(db *gorm.DB, webhookSecretKey string) fasthttp.RequestHandler {
 		// Branch or tag creation
 		case *github.CreateEvent:
 			e := (*github.CreateEvent)(event)
-			log.Tracef("%-18s : %s \n\t%s \n\t%s", "CreateEvent", e.GetRepo(), e.GetRefType(), e.GetRef())
-			save(db, e.Repo.GetName(), string(payload))
+			log.Tracef("%-18s : %s \n\t%s \n\t%s", "CreateEvent", e.GetRepo().GetFullName(), e.GetRefType(), e.GetRef())
+			save(db, e.Repo.GetFullName(), string(payload))
 			process(event)
 
 		// Branch or tag deletion
 		case *github.DeleteEvent:
 			e := (*github.DeleteEvent)(event)
-			log.Tracef("%-18s : %s \n\t%s \n\t%s", "DeleteEvent", e.GetRepo(), e.GetRefType(), e.GetRef())
-			save(db, e.Repo.GetName(), string(payload))
+			log.Tracef("%-18s : %s \n\t%s \n\t%s", "DeleteEvent", e.GetRepo().GetFullName(), e.GetRefType(), e.GetRef())
+			save(db, e.Repo.GetFullName(), string(payload))
 			process(event)
 
 		// Pull requests
 		case *github.PullRequestEvent:
 			e := (*github.PullRequestEvent)(event)
-			log.Tracef("%-18s : %s \n\t[%d] %s", "PullRequestEvent", e.GetRepo(), e.GetNumber(), e.GetAction())
-			save(db, e.Repo.GetName(), string(payload))
+			log.Tracef("%-18s : %s \n\t[%d] %s", "PullRequestEvent", e.GetRepo().GetFullName(), e.GetNumber(), e.GetAction())
+			save(db, e.Repo.GetFullName(), string(payload))
 			process(event)
 
 		// Pushes
 		case *github.PushEvent:
 			e := (*github.PushEvent)(event)
-			log.Tracef("%-18s : %s \n\t%s \n\t%s", "Push", e.GetRepo(), e.GetRef(), e.GetAction())
-			save(db, e.Repo.GetName(), string(payload))
+			log.Tracef("%-18s : %s \n\t%s \n\t%s", "Push", e.GetRepo().GetFullName(), e.GetRef(), e.GetAction())
+			save(db, e.Repo.GetFullName(), string(payload))
 			process(event)
 
 		default:
@@ -124,15 +124,25 @@ func process(event interface{}) {
 }
 
 func save(db *gorm.DB, repo, payload string) {
-	db.Save(&entity{
+	tx := db.Select("Repository", "Payload", "RequestedAt").Create(&entity{
 		Repository:  repo,
 		Payload:     payload,
 		RequestedAt: time.Now(),
 	})
+	if tx.Error != nil {
+		log.Fatal(tx.Error)
+	}
 }
 
 type entity struct {
-	Repository  string    `gorm:"column:repository"`
-	Payload     string    `gorm:"column:payload"`
-	RequestedAt time.Time `gorm:"colum:requested"`
+	ID          int64      `gorm:"column:id"`
+	Repository  string     `gorm:"column:repository"`
+	Payload     string     `gorm:"column:payload"`
+	RequestedAt time.Time  `gorm:"column:requested"`
+	ProcessedAt *time.Time `gorm:"column:processed"`
+	CompletedAt *time.Time `gorm:"column:completed"`
+}
+
+func (entity) TableName() string {
+	return "github_webhook_events"
 }
