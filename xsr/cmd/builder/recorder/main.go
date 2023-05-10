@@ -7,16 +7,18 @@ import (
 	"time"
 
 	// external
+	"github.com/gin-gonic/gin"
 	"github.com/google/go-github/v52/github"
 	log "github.com/sirupsen/logrus"
-	"github.com/valyala/fasthttp"
-	"github.com/valyala/fasthttp/fasthttpadaptor"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
-func main() {
+func init() {
 	log.SetLevel(log.TraceLevel)
+}
+
+func main() {
 
 	// github
 	webhookSecretKey := os.Getenv("GITHUB_WEBHOOK_SECRET")
@@ -46,88 +48,77 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// fasthttp
-	log.Info("RUN XSR Recorder on 0.0.0.0:8080")
-	if err := fasthttp.ListenAndServe("0.0.0.0:8080", handle(db, webhookSecretKey)); err != nil {
-		log.Fatal(err)
-	}
+	// gin-gonic
+	r := gin.New()
+	r.Use(
+		gin.LoggerWithWriter(
+			log.StandardLogger().Out,
+			"/healthz",
+		),
+		gin.Recovery(),
+		func(ctx *gin.Context) {
+			ctx.Set("DB", db)
+			ctx.Set("WebhookSecretKey", webhookSecretKey)
+		},
+	)
+	r.GET("/healthz", health)
+	r.POST("/github/webhooks", handle)
+	r.Run()
 }
 
-// handle returns a fasthttp request handler
-func handle(db *gorm.DB, webhookSecretKey string) fasthttp.RequestHandler {
-	return func(ctx *fasthttp.RequestCtx) {
-		path := ctx.Path()
-		if string(path) == "/healthz" {
-			ctx.SetStatusCode(fasthttp.StatusOK)
-			ctx.SetBody([]byte("OK"))
-			return
-		}
+func health(ctx *gin.Context) {
+	ctx.Status(http.StatusOK)
+}
 
-		if !ctx.IsPost() {
-			ctx.SetStatusCode(fasthttp.StatusMethodNotAllowed)
-			return
-		}
+func handle(ctx *gin.Context) {
+	db := ctx.MustGet("DB").(*gorm.DB)
+	key := ctx.MustGet("WebhookSecretKey").(string)
 
-		defer func() {
-			if r := recover(); r != nil {
-				ctx.SetStatusCode(fasthttp.StatusInternalServerError)
-				ctx.SetContentType("text/html; charset=utf-8")
-				ctx.SetBody([]byte("Internal Server Error"))
-			}
-		}()
-
-		const forServer = false
-		var r http.Request
-		if err := fasthttpadaptor.ConvertRequest(ctx, &r, forServer); err != nil {
-			log.Error(fasthttp.StatusBadRequest, err)
-			ctx.SetStatusCode(fasthttp.StatusBadRequest)
-			return
-		}
-
-		payload, err := github.ValidatePayload(&r, []byte(webhookSecretKey))
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		eventType := github.WebHookType(&r)
-		event, err := github.ParseWebHook(eventType, payload)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		switch event := event.(type) {
-		// Branch or tag creation
-		case *github.CreateEvent:
-			e := (*github.CreateEvent)(event)
-			log.Tracef("%-18s : %s \n\t%s \n\t%s", "CreateEvent", e.GetRepo().GetFullName(), e.GetRefType(), e.GetRef())
-			save(db, eventType, e.Repo.GetFullName(), string(payload))
-			process(event)
-
-		// Branch or tag deletion
-		case *github.DeleteEvent:
-			e := (*github.DeleteEvent)(event)
-			log.Tracef("%-18s : %s \n\t%s \n\t%s", "DeleteEvent", e.GetRepo().GetFullName(), e.GetRefType(), e.GetRef())
-			save(db, eventType, e.Repo.GetFullName(), string(payload))
-			process(event)
-
-		// Pull requests
-		case *github.PullRequestEvent:
-			e := (*github.PullRequestEvent)(event)
-			log.Tracef("%-18s : %s \n\t[%d] %s", "PullRequestEvent", e.GetRepo().GetFullName(), e.GetNumber(), e.GetAction())
-			save(db, eventType, e.Repo.GetFullName(), string(payload))
-			process(event)
-
-		// Pushes
-		case *github.PushEvent:
-			e := (*github.PushEvent)(event)
-			log.Tracef("%-18s : %s \n\t%s \n\t%s", "Push", e.GetRepo().GetFullName(), e.GetRef(), e.GetAction())
-			save(db, eventType, e.Repo.GetFullName(), string(payload))
-			process(event)
-
-		default:
-			log.Infof("Ignore '%s' event type", eventType)
-		}
+	payload, err := github.ValidatePayload(ctx.Request, []byte(key))
+	if err != nil {
+		log.Fatal(err)
 	}
+
+	eventType := github.WebHookType(ctx.Request)
+	event, err := github.ParseWebHook(eventType, payload)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	switch event := event.(type) {
+	// Branch or tag creation
+	case *github.CreateEvent:
+		e := (*github.CreateEvent)(event)
+		log.Tracef("%-18s : %s \n\t%s \n\t%s", "CreateEvent", e.GetRepo().GetFullName(), e.GetRefType(), e.GetRef())
+		save(db, eventType, e.Repo.GetFullName(), string(payload))
+		process(event)
+
+	// Branch or tag deletion
+	case *github.DeleteEvent:
+		e := (*github.DeleteEvent)(event)
+		log.Tracef("%-18s : %s \n\t%s \n\t%s", "DeleteEvent", e.GetRepo().GetFullName(), e.GetRefType(), e.GetRef())
+		save(db, eventType, e.Repo.GetFullName(), string(payload))
+		process(event)
+
+	// Pull requests
+	case *github.PullRequestEvent:
+		e := (*github.PullRequestEvent)(event)
+		log.Tracef("%-18s : %s \n\t[%d] %s", "PullRequestEvent", e.GetRepo().GetFullName(), e.GetNumber(), e.GetAction())
+		save(db, eventType, e.Repo.GetFullName(), string(payload))
+		process(event)
+
+	// Pushes
+	case *github.PushEvent:
+		e := (*github.PushEvent)(event)
+		log.Tracef("%-18s : %s \n\t%s \n\t%s", "Push", e.GetRepo().GetFullName(), e.GetRef(), e.GetAction())
+		save(db, eventType, e.Repo.GetFullName(), string(payload))
+		process(event)
+
+	default:
+		log.Infof("Ignore '%s' event type", eventType)
+	}
+
+	ctx.Status(http.StatusOK)
 }
 
 func process(event interface{}) {
