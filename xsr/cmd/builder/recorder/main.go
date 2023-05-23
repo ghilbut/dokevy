@@ -90,28 +90,28 @@ func handle(ctx *gin.Context) {
 	case *github.CreateEvent:
 		e := (*github.CreateEvent)(event)
 		log.Tracef("%-18s : %s \n\t%s \n\t%s", "CreateEvent", e.GetRepo().GetFullName(), e.GetRefType(), e.GetRef())
-		save(db, eventType, e.Repo.GetFullName(), string(payload))
+		save(db, e.Repo.GetFullName(), eventType, string(payload))
 		process(event)
 
 	// Branch or tag deletion
 	case *github.DeleteEvent:
 		e := (*github.DeleteEvent)(event)
 		log.Tracef("%-18s : %s \n\t%s \n\t%s", "DeleteEvent", e.GetRepo().GetFullName(), e.GetRefType(), e.GetRef())
-		save(db, eventType, e.Repo.GetFullName(), string(payload))
+		save(db, e.Repo.GetFullName(), eventType, string(payload))
 		process(event)
 
 	// Pull requests
 	case *github.PullRequestEvent:
 		e := (*github.PullRequestEvent)(event)
 		log.Tracef("%-18s : %s \n\t[%d] %s", "PullRequestEvent", e.GetRepo().GetFullName(), e.GetNumber(), e.GetAction())
-		save(db, eventType, e.Repo.GetFullName(), string(payload))
+		save(db, e.Repo.GetFullName(), eventType, string(payload))
 		process(event)
 
 	// Pushes
 	case *github.PushEvent:
 		e := (*github.PushEvent)(event)
 		log.Tracef("%-18s : %s \n\t%s \n\t%s", "Push", e.GetRepo().GetFullName(), e.GetRef(), e.GetAction())
-		save(db, eventType, e.Repo.GetFullName(), string(payload))
+		save(db, e.Repo.GetFullName(), eventType, string(payload))
 		process(event)
 
 	default:
