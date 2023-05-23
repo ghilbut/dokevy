@@ -19,7 +19,7 @@ export const authOptions: NextAuthOptions = {
                     id: profile.sub,
                     name: profile.name,
                     email: profile.email,
-                    image: string(profile.picture),
+                    image: profile.picture,
                 }
             },
         },
