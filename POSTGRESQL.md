@@ -60,7 +60,18 @@ CREATE INDEX IF NOT EXISTS nextauth_verification_token_index ON nextauth_verific
 **Create Databases**
 
 ```postgresql
-CREATE TABLE IF NOT EXISTS "polykube_terraaform_secret_backends" (
+
+CREATE TABLE IF NOT EXISTS "dokevy_secret_shared_secrets" (
+  "id"         BIGSERIAL,
+  "name"       VARCHAR(255) NOT NULL,
+  "secrets"    JSON,
+  "created_at" TIMESTAMP WITH TIME ZONE NOT NULL,
+  "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL,
+  UNIQUE ("name"),
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE IF NOT EXISTS "dokevy_secret_scoped_groups" (
   "id"         BIGSERIAL,
   "name"       VARCHAR(255) NOT NULL,
   "created_at" TIMESTAMP WITH TIME ZONE,
@@ -69,18 +80,17 @@ CREATE TABLE IF NOT EXISTS "polykube_terraaform_secret_backends" (
   PRIMARY KEY ("id")
 );
 
-CREATE TABLE IF NOT EXISTS "polykube_terraaform_secret_values" (
+CREATE TABLE IF NOT EXISTS "dokevy_secret_scoped_secrets" (
   "id"         BIGSERIAL,
-  "secret"     BIGSERIAL REFERENCES "polykube_terraaform_secret_backends" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
-  "key"        VARCHAR(255) NOT NULL,
-  "value"      TEXT,
+  "group"      BIGSERIAL REFERENCES "dokevy_secret_scoped_groups" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+  "secrets"    JSON,
   "created_at" TIMESTAMP WITH TIME ZONE NOT NULL,
   "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL,
-  UNIQUE ("secret", "key"),
+  UNIQUE ("group"),
   PRIMARY KEY ("id")
 );
 
-CREATE TABLE IF NOT EXISTS "polykube_terraform_bots" (
+CREATE TABLE IF NOT EXISTS "dokevy_terraform_bots" (
   "id"          BIGSERIAL,
   "username"    VARCHAR(255) NOT NULL,
   "password"    VARCHAR(64) NOT NULL,
@@ -92,5 +102,5 @@ CREATE TABLE IF NOT EXISTS "polykube_terraform_bots" (
   PRIMARY KEY ("id")
 );
 
-CREATE INDEX IF NOT EXISTS polykube_terraform_bot_creator_index ON polykube_terraform_bots (created_by);
+CREATE INDEX IF NOT EXISTS dokevy_terraform_bot_creator_index ON dokevy_terraform_bots (created_by);
 ```
