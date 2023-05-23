@@ -16,7 +16,7 @@ export default function Adapter(): DefaultAdapter {
     // https://node-postgres.com/apis/pool
     const config: PoolConfig = {
         // client
-        application_name: 'polykube',
+        application_name: 'dokevy',
         host: process.env.PGHOST || 'localhost',
         port: Number(process.env.PGPORT || '5432'),
         user: process.env.PGUSER || 'postgres',
