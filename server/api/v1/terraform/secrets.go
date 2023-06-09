@@ -16,15 +16,6 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func addSecretRoutes(g *gin.RouterGroup) {
-	g.GET("/:name", HandleGetSecret)
-	g.POST("/:name", HandleCreateSecret)
-	g.DELETE("/:name", HandleDeleteSecret)
-	g.POST("/:name/values", HandleCreateSecretValue)
-	g.PUT("/:name/values/:key", HandleUpdateSecretValue)
-	g.DELETE("/:name/values/:key", HandleDeleteSecretValue)
-}
-
 const tfmain = `
 terraform {
   backend local {

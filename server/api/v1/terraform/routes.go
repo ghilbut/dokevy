@@ -16,13 +16,18 @@ import (
 
 func AddRoutes(g *gin.RouterGroup) {
 	const (
-		states_path  = "/states"
 		secrets_path = "/secrets"
 	)
-	states := g.Group(states_path, middleware)
-	addStateRoutes(states)
 	secrets := g.Group(secrets_path, middleware)
-	addSecretRoutes(secrets)
+	// Get values by terraform_remote_state
+	secrets.GET("/:group", HandleGetSecret)
+
+	secrets.GET("/groups/:name", HandleGetSecret)
+	secrets.POST("/groups/:name", HandleCreateSecret)
+	secrets.DELETE("/groups/:name", HandleDeleteSecret)
+	secrets.POST("/groups/:name/values", HandleCreateSecretValue)
+	secrets.PUT("/groups/:name/values/:key", HandleUpdateSecretValue)
+	secrets.DELETE("/groups/:name/values/:key", HandleDeleteSecretValue)
 }
 
 func middleware(ctx *gin.Context) {
