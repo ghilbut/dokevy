@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { trpc } from "@/utils/trpc/trpc";
+import { trpc } from "~/trpc/trpc";
 
 export default function ListUsers() {
     let { data: users, isLoading, isFetching } = trpc.getUsers.useQuery();

@@ -1,6 +1,6 @@
 import './globals.css'
 import { Inter } from 'next/font/google'
-import { TrpcProvider } from '@/components/TrpcProvider';
+import { TrpcProvider } from '~/components/TrpcProvider';
 
 const inter = Inter({ subsets: ['latin'] })
 
