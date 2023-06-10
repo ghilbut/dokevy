@@ -11,6 +11,12 @@
     "build-storybook": "storybook build"
   },
   "dependencies": {
+    "@tanstack/react-query": "^4.29.12",
+    "@tanstack/react-query-devtools": "^4.29.12",
+    "@trpc/client": "^10.29.1",
+    "@trpc/next": "^10.29.1",
+    "@trpc/react-query": "^10.29.1",
+    "@trpc/server": "^10.29.1",
     "@types/node": "20.0.0",
     "@types/react": "18.2.5",
     "@types/react-dom": "18.2.3",
@@ -24,8 +30,10 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "storybook": "^7.0.9",
+    "superjson": "^1.12.3",
     "tailwindcss": "3.3.2",
-    "typescript": "5.0.4"
+    "typescript": "5.0.4",
+    "zod": "^3.21.4"
   },
   "devDependencies": {
     "@storybook/addon-essentials": "^7.0.9",
@@ -35,7 +43,7 @@
     "@storybook/nextjs": "^7.0.9",
     "@storybook/react": "^7.0.9",
     "@storybook/testing-library": "^0.0.14-next.2",
-    "eslint-plugin-storybook": "^0.6.12",
-    "@types/pg": "^8.10.1"
+    "@types/pg": "^8.10.1",
+    "eslint-plugin-storybook": "^0.6.12"
   }
 }

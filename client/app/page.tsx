@@ -6,11 +6,28 @@ import {
   LogoutButton,
   ProfileButton,
   RegisterButton,
-} from '@/lib/components/buttons.component';
+} from '@/components/buttons.component';
+import ListUsers from "@/components/ListUsers";
 
 export default async function Home() {
   const session = await getServerSession(authOptions);
   console.log(session);
+
+  return (
+      <main style={{ maxWidth: 1200, marginInline: "auto", padding: 20 }}>
+        <div>
+          <LoginButton />
+          <RegisterButton />
+          <LogoutButton />
+          <ProfileButton />
+
+          <h1>Server Session</h1>
+          <pre>{JSON.stringify(session)}</pre>
+        </div>
+
+        <ListUsers />
+      </main>
+  );
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
