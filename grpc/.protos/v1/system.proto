@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package dokevy.v1;
+
+import "google/protobuf/empty.proto";
+
+option go_package = "github.com/ghilbut/dokevy/grpc";
+option java_multiple_files = true;
+option java_outer_classname = "SystemProto";
+option java_package = "com.ghilbut.dokevy.v1";
+option objc_class_prefix = "RPC";
+
+
+service SystemService {
+  rpc Ping(google.protobuf.Empty) returns (Pong) {
+  }
+}
+
+message Pong {
+  string pong = 1;
+}
