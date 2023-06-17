@@ -1,6 +1,10 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+/* MUI Roboto font from Goolgle Web Fonts CDN */
+@import url('https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap');
+/* MUI Icons font from Goolgle Web Fonts CDN */
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
 
 :root {
   --foreground-rgb: 0, 0, 0;
