@@ -1,6 +1,6 @@
 'use strict';
 
-import {Pool, PoolConfig, QueryResult, QueryResultRow} from 'pg'
+import {Pool, QueryResult, QueryResultRow} from 'pg'
 import {Awaitable} from 'next-auth';
 import {AdapterAccount, AdapterSession, AdapterUser, DefaultAdapter, VerificationToken} from 'next-auth/adapters';
 import {list} from "postcss";
@@ -9,6 +9,25 @@ const AccountTableName: string           = 'nextauth_accounts';
 const SessionTableName: string           = 'nextauth_sessions';
 const UserTableName: string              = 'nextauth_users';
 const VerificationTokenTableName: string = 'nextauth_verification_tokens';
+
+interface AdapterSessionRow {
+    session_token: string;
+    user_id: string;
+    expires: Date;
+}
+
+interface AdapterUserRow {
+    id: string
+    name: string
+    email: string
+    email_verified: Date | null
+    image: string | null
+}
+
+interface Query {
+    text: string;
+    values: Array<any>;
+}
 
 export default function NextAuth(): DefaultAdapter {
 
@@ -33,7 +52,7 @@ export default function NextAuth(): DefaultAdapter {
         min: Number(process.env.PGMIN || '5'),
     });
 
-    function doQuery<T extends QueryResultRow>(query: { text: string, values: Array<any> }): Promise<T> {
+    function doQuery<T extends QueryResultRow>(query: Query): Promise<T> {
         return new Promise<T>(async (resolve, reject) => {
             try {
                 const res: QueryResult<T> = await pool.query(query);
@@ -44,7 +63,7 @@ export default function NextAuth(): DefaultAdapter {
         });
     }
 
-    function doQueryWithEmpty<T extends QueryResultRow, E extends null|undefined>(query: any, empty: E): Promise<T|E> {
+    function doQueryWithEmpty<T extends QueryResultRow, E extends null|undefined>(query: Query, empty: E): Promise<T|E> {
         return new Promise<T | E>(async (resolve, reject) => {
             try {
                 const res: QueryResult<T> = await pool.query(query);
@@ -158,12 +177,7 @@ export default function NextAuth(): DefaultAdapter {
 
             return new Promise<AdapterSession>(async (resolve, reject) => {
                 try {
-                    interface Row {
-                        session_token: string;
-                        user_id: string;
-                        expires: Date;
-                    }
-                    const res: QueryResult<Row> = await pool.query(query);
+                    const res: QueryResult<AdapterSessionRow> = await pool.query(query);
                     const row = res.rows[0];
                     resolve({
                         sessionToken: row.session_token,
@@ -184,21 +198,22 @@ export default function NextAuth(): DefaultAdapter {
 
             return new Promise<{ session: AdapterSession, user: AdapterUser } | null>(async (resolve, reject) => {
                 try {
-                    const res: QueryResult<any> = await pool.query(query);
+                    interface Row extends AdapterSessionRow, AdapterUserRow {}
+                    const res: QueryResult<Row> = await pool.query(query);
                     const row = res.rows[0];
                     if (res.rowCount == 1) {
                         resolve({
                             session: {
-                                expires:      row['expires'],
-                                sessionToken: row['session_token'],
-                                userId:       row['user_id'],
+                                expires:      row.expires,
+                                sessionToken: row.session_token,
+                                userId:       row.user_id,
                             },
                             user: {
-                                id:            row['id'],
-                                name:          row['name'],
-                                email:         row['email'],
-                                emailVerified: row['email_verified'],
-                                image:         row['image'],
+                                id:            row.id,
+                                name:          row.name,
+                                email:         row.email,
+                                emailVerified: row.email_verified,
+                                image:         row.image,
                             }
                         });
                     } else {
