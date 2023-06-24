@@ -1,0 +1,11 @@
+.github
+.k8s
+.local
+
+./fastify/bin
+./fastify/node_modules
+./grcp
+./next.js
+./react.js/build
+./react.js/node_modules
+./xsr
